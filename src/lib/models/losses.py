@@ -63,8 +63,8 @@ class FusionLoss(nn.Module):
     if self.reg_weight > 0:
       loss += (self.reg_weight * reg_loss(pred, target, mask)).to('cpu')
     if self.var_weight > 0:
-      loss += VarLoss(
-        self.device, self.var_weight)(pred, target, mask, gt_2d)[0] # target for visibility
+      loss += (VarLoss(
+        self.device, self.var_weight)(pred, target, mask, gt_2d)[0]).to('cpu') # target for visibility
     return loss.to(self.device, non_blocking=True)
 
 class VarLoss(Function):
