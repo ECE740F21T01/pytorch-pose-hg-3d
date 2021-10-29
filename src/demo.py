@@ -45,8 +45,8 @@ def demo_image(image, model, opt):
   debugger.add_img(image)
   debugger.add_point_2d(pred, (255, 0, 0))
   debugger.add_point_3d(pred_3d, 'b')
-  debugger.show_all_imgs(pause=False)
-  debugger.show_3d()
+#   debugger.show_all_imgs(pause=False)
+#   debugger.show_3d()
 
 def main(opt):
   opt.heads['depth'] = opt.num_output
