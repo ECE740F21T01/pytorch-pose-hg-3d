@@ -3,13 +3,15 @@ import numpy as np
 import torch
 from .mpii import MPII
 from .h36m import H36M
+from .mpii3d import MPII3D
 
 class Fusion3D(data.Dataset):
   def __init__(self, opt, split):
     self.opt = opt
     self.ratio3D = 1
     self.split = split
-    self.dataset3D = H36M(opt, split)
+    # self.dataset3D = H36M(opt, split)
+    self.dataset3D = MPII3D(opt, split)
     if self.split == 'train':
       self.dataset2D = MPII(opt, split)
       self.nImages2D = len(self.dataset2D)
