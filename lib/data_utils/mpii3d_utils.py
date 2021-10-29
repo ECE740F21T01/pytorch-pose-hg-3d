@@ -15,7 +15,7 @@ from lib.core.config import VIBE_DB_DIR
 from lib.utils.utils import tqdm_enumerate
 from lib.data_utils.kp_utils import convert_kps
 from lib.data_utils.img_utils import get_bbox_from_kp2d
-from lib.data_utils.feature_extractor import extract_features
+# from lib.data_utils.feature_extractor import extract_features
 
 
 def read_openpose(json_file, gt_part, dataset):
@@ -81,10 +81,10 @@ def read_data_train(dataset_path, debug=False):
         'vid_name': [],
         'frame_id': [],
         'joints3D': [],
+        'joints3D_absolute': [],
         'joints2D': [],
         'bbox': [],
         'img_name': [],
-        'features': [],
     }
 
     model = spin.get_pretrained_hmr()
@@ -127,6 +127,9 @@ def read_data_train(dataset_path, debug=False):
                     joints_2d_raw= np.append(joints_2d_raw, np.ones((1,28,1)), axis=2)
                     joints_2d = convert_kps(joints_2d_raw, "mpii3d",  "spin").reshape((-1,3))
 
+                    # convert back to mpii format, for using with pytorch-pose-hg-3d
+                    joints_2d = convert_kps(joints_2d.reshape((1, -1, 3)), "spin", "mpii").reshape((-1,3))
+
                     # visualize = True
                     # if visualize == True and i == 500:
                     #     import matplotlib.pyplot as plt
@@ -156,7 +159,12 @@ def read_data_train(dataset_path, debug=False):
 
                     bbox = get_bbox_from_kp2d(joints_2d[~np.all(joints_2d == 0, axis=1)]).reshape(4)
 
+                    joints_3d_absolute = joints_3d
                     joints_3d = joints_3d - joints_3d[39]  # 4 is the root
+                    
+                    # convert back to mpii format, for using with pytorch-pose-hg-3d
+                    joints_3d = convert_kps(joints_3d.reshape((1, -1, 3)), "spin", "mpii").reshape((-1,3))
+                    joints_3d_absolute = convert_kps(joints_3d_absolute.reshape((1, -1, 3)), "spin", "mpii").reshape((-1,3))
 
                     # check that all joints are visible
                     x_in = np.logical_and(joints_2d[:, 0] < w, joints_2d[:, 0] >= 0)
@@ -172,6 +180,7 @@ def read_data_train(dataset_path, debug=False):
                     dataset['img_name'].append(img_i)
                     dataset['joints2D'].append(joints_2d)
                     dataset['joints3D'].append(joints_3d)
+                    dataset['joints3D_absolute'].append(joints_3d_absolute)
                     dataset['bbox'].append(bbox)
                     vid_segments.append(vid_uniq_id)
                     vid_used_frames.append(img_i)
@@ -184,16 +193,16 @@ def read_data_train(dataset_path, debug=False):
                 if (np.where(vid_segments[:-1] != vid_segments[1:])[0]).size != 0:
                     ids[1:-1] = (np.where(vid_segments[:-1] != vid_segments[1:])[0]) + 1
 
-                for i in tqdm(range(len(set(vid_segments)))):
-                    features = extract_features(model, np.array(vid_used_frames)[int(ids[i]):int(ids[i+1])],
-                                                vid_used_bbox[int(ids[i]):int((ids[i+1]))],
-                                                kp_2d=np.array(vid_used_joints)[int(ids[i]):int(ids[i+1])],
-                                                dataset='spin', debug=False)
-                    dataset['features'].append(features)
+                # for i in tqdm(range(len(set(vid_segments)))):
+                #     features = extract_features(model, np.array(vid_used_frames)[int(ids[i]):int(ids[i+1])],
+                #                                 vid_used_bbox[int(ids[i]):int((ids[i+1]))],
+                #                                 kp_2d=np.array(vid_used_joints)[int(ids[i]):int(ids[i+1])],
+                #                                 dataset='spin', debug=False)
+                #     dataset['features'].append(features)
 
     for k in dataset.keys():
         dataset[k] = np.array(dataset[k])
-    dataset['features'] = np.concatenate(dataset['features'])
+    # dataset['features'] = np.concatenate(dataset['features'])
 
     return dataset
 
@@ -204,10 +213,10 @@ def read_test_data(dataset_path):
         'vid_name': [],
         'frame_id': [],
         'joints3D': [],
+        'joints3D_absolute': [],
         'joints2D': [],
         'bbox': [],
         'img_name': [],
-        'features': [],
         "valid_i": []
     }
 
@@ -247,6 +256,9 @@ def read_test_data(dataset_path):
 
             joints_2d = convert_kps(joints_2d_raw, src="mpii3d_test", dst="spin").reshape((-1, 3))
 
+            # convert back to mpii format, for using with pytorch-pose-hg-3d
+            joints_2d = convert_kps(joints_2d.reshape((1, -1, 3)), "spin", "mpii").reshape((-1,3))
+
             # visualize = True
             # if visualize == True:
             #     import matplotlib.pyplot as plt
@@ -272,7 +284,13 @@ def read_test_data(dataset_path):
 
             joints_3d_raw = np.reshape(annot3[frame_i, 0, :, :], (1, 17, 3)) / 1000
             joints_3d = convert_kps(joints_3d_raw, "mpii3d_test", "spin").reshape((-1, 3))
+
+            joints_3d_absolute = joints_3d
             joints_3d = joints_3d - joints_3d[39] # substract pelvis zero is the root for test
+            
+            # convert back to mpii format, for using with pytorch-pose-hg-3d
+            joints_3d = convert_kps(joints_3d.reshape((1, -1, 3)), "spin", "mpii").reshape((-1,3))
+            joints_3d_absolute = convert_kps(joints_3d_absolute.reshape((1, -1, 3)), "spin", "mpii").reshape((-1,3))
 
             bbox = get_bbox_from_kp2d(joints_2d[~np.all(joints_2d == 0, axis=1)]).reshape(4)
 
@@ -296,6 +314,7 @@ def read_test_data(dataset_path):
             dataset['img_name'].append(img_file)
             dataset['joints2D'].append(joints_2d)
             dataset['joints3D'].append(joints_3d)
+            dataset['joints3D_absolute'].append(joints_3d_absolute)
             dataset['bbox'].append(bbox)
             dataset['valid_i'].append(valid_i)
 
@@ -310,16 +329,16 @@ def read_test_data(dataset_path):
         if (np.where(vid_segments[:-1] != vid_segments[1:])[0]).size != 0:
             ids[1:-1] = (np.where(vid_segments[:-1] != vid_segments[1:])[0]) + 1
 
-        for i in tqdm(range(len(set(vid_segments)))):
-            features = extract_features(model, np.array(vid_used_frames)[int(ids[i]):int(ids[i + 1])],
-                                        vid_used_bbox[int(ids[i]):int(ids[i + 1])],
-                                        kp_2d=np.array(vid_used_joints)[int(ids[i]):int(ids[i + 1])],
-                                        dataset='spin', debug=False)
-            dataset['features'].append(features)
+        # for i in tqdm(range(len(set(vid_segments)))):
+        #     features = extract_features(model, np.array(vid_used_frames)[int(ids[i]):int(ids[i + 1])],
+        #                                 vid_used_bbox[int(ids[i]):int(ids[i + 1])],
+        #                                 kp_2d=np.array(vid_used_joints)[int(ids[i]):int(ids[i + 1])],
+        #                                 dataset='spin', debug=False)
+        #     dataset['features'].append(features)
 
     for k in dataset.keys():
         dataset[k] = np.array(dataset[k])
-    dataset['features'] = np.concatenate(dataset['features'])
+    # dataset['features'] = np.concatenate(dataset['features'])
 
     return dataset
 

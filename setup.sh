@@ -34,5 +34,5 @@ pip install git+https://github.com/giacaglia/pytube.git --upgrade
 pip install -r lib/vibe_requirements.txt  --ignore-installed certifi
 
 # VIBE prepares MPI-INF-3DHP:
-source prepare_data.sh
-source prepare_training_data.sh
+source scripts/prepare_data.sh
+source scripts/prepare_training_data.sh
