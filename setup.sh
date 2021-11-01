@@ -27,6 +27,9 @@ ln -s /data/keith/datasets/mpii_human_pose_v1/annot /data/liyao/projects/ECE740/
 ln -s /data/keith/datasets/mpii_human_pose_v1/images /data/liyao/projects/ECE740/pytorch-pose-hg-3d/data/mpii/
 # MPI-INF-3DHP:
 ln -s /data/liyao/datasets/mpi_inf_3dhp /data/liyao/projects/ECE740/pytorch-pose-hg-3d/data/
+# 3DPW:
+ln -s /data/ruichen/imageFiles /data/liyao/projects/ECE740/pytorch-pose-hg-3d/data/3dpw/
+ln -s /data/ruichen/sequenceFiles /data/liyao/projects/ECE740/pytorch-pose-hg-3d/data/3dpw/
 
 # Install additional envs from VIBE:
 # pip install numpy==1.17.5 torch==1.4.0 torchvision==0.5.0
