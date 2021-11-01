@@ -40,7 +40,7 @@ class MPII3D(data.Dataset):
                      [0, 7], [7, 8], [8, 10],\
                      [16, 15], [15, 14], [14, 8], [8, 11], [11, 12], [12, 13]]
     self.mean_bone_length = 4000
-    # TODO: change mean and std to the correct value for MPII3D, instead of for H36M
+    # normalize to mean and std of Imagenet
     self.mean = np.array([0.485, 0.456, 0.406], np.float32).reshape(1, 1, 3)
     self.std = np.array([0.229, 0.224, 0.225], np.float32).reshape(1, 1, 3)
     self.aspect_ratio = 1.0 * opt.input_w / opt.input_h
@@ -51,7 +51,7 @@ class MPII3D(data.Dataset):
       self.opt.data_dir, 'vibe_db', 'mpii3d_{}_db.pt'.format(self.split))
     self.annot = joblib.load(ann_path)
     self.annot = [dict(zip(self.annot,t)) for t in zip(*(self.annot).values())] # convert dict of lists, to list of dicts
-    # keys in dataset: dict_keys(['vid_name', 'frame_id', 'joints3D', 'joints2D', 'bbox', 'img_name'])
+    # keys in dataset: dict_keys(['vid_name', 'frame_id', 'joints3D', joints3D_absolute, 'joints2D', 'bbox', 'img_name'])
 
     # dowmsample validation data
     self.idxs = np.arange(len(self.annot)) if split == 'train' \
@@ -65,7 +65,7 @@ class MPII3D(data.Dataset):
     return img
   
   def _get_part_info(self, index):
-    # keys in dataset: dict_keys(['vid_name', 'frame_id', 'joints3D', 'joints2D', 'bbox', 'img_name'])
+    # keys in dataset: dict_keys(['vid_name', 'frame_id', 'joints3D', joints3D_absolute, 'joints2D', 'bbox', 'img_name'])
     # bbox = [c_x, c_y, w, h]
     # change to use mpii3d format.
     ann = self.annot[self.idxs[index]]
