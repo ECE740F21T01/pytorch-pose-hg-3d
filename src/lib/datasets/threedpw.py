@@ -71,7 +71,7 @@ class ThreeDPW(data.Dataset):
     ann = self.annot[self.idxs[index]]
     gt_3d = np.array(ann['joints3D'], np.float32) # relative joint coordinates, relative to pelvis, in mpii format (16 joints)
     gt_3d = gt_3d[self.mpii_to_h36m][:17] # relative joint coordinates, relative to pelvis, converted to H36M format (17 joints)
-    pts = np.array(ann['joints3D_absolute'], np.float32) # non-relative joint coordinates, in mpii format (16 joints)
+    pts = np.array(ann['joints3D_image'], np.float32) # j3d_image is [image_coord_x, image_coord_y, depth-root depth], in mpii format (16 joints)
     c = np.array([ann['bbox'][0], ann['bbox'][1]], dtype=np.float32) # c_x, c_y for bbox
     s = max(ann['bbox'][2], ann['bbox'][3]) # w, h for bbox
     return gt_3d, pts, c, s

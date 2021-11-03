@@ -39,13 +39,36 @@ NUM_JOINTS = 24
 VIS_THRESH = 0.3
 MIN_KP = 6
 
+def convert_kps_coco18_mpii(joints2d):
+    src_names = eval(f'get_coco18_joint_names')()
+    dst_names = eval(f'get_mpii_joint_names')()
+
+    out_joints2d = np.zeros((joints2d.shape[0], len(dst_names), 3))
+
+    for idx, jn in enumerate(dst_names):
+        # need to infer "hip", "thorax", "neck", "headtop" from other existing joints
+        if jn in src_names:
+            out_joints2d[:, idx] = joints2d[:, src_names.index(jn)]
+        elif jn == "hip":
+            out_joints2d[:, idx] = (joints2d[:, src_names.index("lhip")] + joints2d[:, src_names.index("rhip")]) * 0.5
+            out_joints2d[:, idx, 2] = joints2d[:, src_names.index("lhip"), 2] * joints2d[:, src_names.index("rhip"), 2]
+        elif jn == "thorax":
+            out_joints2d[:, idx] = (joints2d[:, src_names.index("lshoulder")] + joints2d[:, src_names.index("rshoulder")]) * 0.5
+            out_joints2d[:, idx, 2] = joints2d[:, src_names.index("lshoulder"), 2] * joints2d[:, src_names.index("rshoulder"), 2] 
+        elif jn == "neck":
+            out_joints2d[:, idx] = joints2d[:, src_names.index("nose")]
+        elif jn == "headtop":
+            out_joints2d[:, idx] = joints2d[:, src_names.index("nose")]
+
+    return out_joints2d
+
 def read_data(folder, set, debug=False):
 
     dataset = {
         'vid_name': [],
         'frame_id': [],
         'joints3D': [],
-        'joints3D_absolute': [],
+        'joints3D_image': [],
         'joints2D': [],
         'shape': [],
         'pose': [],
@@ -103,25 +126,16 @@ def read_data(folder, set, debug=False):
                 vertices = output.vertices
                 J_regressor_batch = J_regressor[None, :].expand(vertices.shape[0], -1, -1).to(vertices.device)
                 j3d = torch.matmul(J_regressor_batch, vertices)
-                j3d = j3d[:, H36M_TO_J14, :]
+                # convert H36M format to mpii format, for using with pytorch-pose-hg-3d
+                j3d = j3d[:, INDEX_H36M_TO_MPII, :] * 1000 # convert to mm
+                j3d = j3d - np.repeat(j3d[:,6,:][:, np.newaxis, :], j3d.shape[1], axis=1) # 6 is the root (hip) in MPII
 
-                # convert from J14 (common) to spin format, and then to mpii format
-                j3d = convert_kps(j3d, "common", "spin")
-                j3d_absolute = j3d
-                j3d = j3d - np.repeat(j3d[:,39,:][:, np.newaxis, :], j3d.shape[1], axis=1) # 4 is the root
-                # convert back to mpii format, for using with pytorch-pose-hg-3d
-                j3d = convert_kps(j3d, "spin", "mpii")
-                j3d_absolute = convert_kps(j3d_absolute, "spin", "mpii")
             
             else:
                 # for training set
-                # convert from J49 (spin) to mpii format
-                j3d = convert_kps(j3d, "spin", "spin")
-                j3d_absolute = j3d
-                j3d = j3d - np.repeat(j3d[:,39,:][:, np.newaxis, :], j3d.shape[1], axis=1) # 4 is the root
-                # convert back to mpii format, for using with pytorch-pose-hg-3d
-                j3d = convert_kps(j3d, "spin", "mpii")
-                j3d_absolute = convert_kps(j3d_absolute, "spin", "mpii")
+                # convert J49 (spin) format to mpii format, for using with pytorch-pose-hg-3d
+                j3d = convert_kps(j3d, "spin", "mpii") * 1000 # convert to mm
+                j3d = j3d - np.repeat(j3d[:,6,:][:, np.newaxis, :], j3d.shape[1], axis=1) # 6 is the root (hip) in MPII
 
             img_paths = []
             for i_frame in range(num_frames):
@@ -139,14 +153,13 @@ def read_data(folder, set, debug=False):
             bbox = np.vstack([c_x,c_y,w,h]).T
 
             # process keypoints
+            # Convert from coco 18 (used by 3dpw 2d annotation) to mpii 2d keypoint format
+            j2d = convert_kps_coco18_mpii(j2d)
             j2d[:, :, 2] = j2d[:, :, 2] > 0.3  # set the visibility flags
-            # Convert to common 2d keypoint format
-            perm_idxs = get_perm_idxs('3dpw', 'common')
-            perm_idxs += [0, 0]  # no neck, top head
-            j2d = j2d[:, perm_idxs]
-            j2d[:, 12:, 2] = 0.0
-            j2d = convert_kps(j2d, "common", "mpii")
 
+            # j3d_image is [image_coord_x, image_coord_y, depth-root depth]
+            j3d_image = j2d.copy()
+            j3d_image[:, :, 2] = j3d[:, :, 2]
             # print('j2d', j2d[time_pt1:time_pt2].shape)
             # print('campose', campose_valid[time_pt1:time_pt2].shape)
 
@@ -155,13 +168,12 @@ def read_data(folder, set, debug=False):
             dataset['frame_id'].append(np.arange(0, num_frames)[time_pt1:time_pt2])
             dataset['img_name'].append(img_paths_array)
             dataset['joints3D'].append(j3d[time_pt1:time_pt2])
-            dataset['joints3D_absolute'].append(j3d_absolute[time_pt1:time_pt2])
+            dataset['joints3D_image'].append(j3d_image[time_pt1:time_pt2])
             dataset['joints2D'].append(j2d[time_pt1:time_pt2])
             dataset['shape'].append(shape.numpy()[time_pt1:time_pt2])
             dataset['pose'].append(pose.numpy()[time_pt1:time_pt2])
             dataset['bbox'].append(bbox)
             dataset['valid'].append(campose_valid[time_pt1:time_pt2])
-
             # features = extract_features(model, img_paths_array, bbox,
             #                             kp_2d=j2d[time_pt1:time_pt2], debug=debug, dataset='3dpw', scale=1.2)
             # dataset['features'].append(features)

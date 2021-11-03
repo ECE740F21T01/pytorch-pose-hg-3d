@@ -13,7 +13,7 @@ import scipy.io as sio
 from lib.models import spin
 from lib.core.config import VIBE_DB_DIR
 from lib.utils.utils import tqdm_enumerate
-from lib.data_utils.kp_utils import convert_kps
+from lib.data_utils.kp_utils import convert_kps, INDEX_MPII3D_TO_MPII, INDEX_MPII3D_TEST_TO_MPII
 from lib.data_utils.img_utils import get_bbox_from_kp2d
 # from lib.data_utils.feature_extractor import extract_features
 
@@ -81,7 +81,7 @@ def read_data_train(dataset_path, debug=False):
         'vid_name': [],
         'frame_id': [],
         'joints3D': [],
-        'joints3D_absolute': [],
+        'joints3D_image': [],
         'joints2D': [],
         'bbox': [],
         'img_name': [],
@@ -105,7 +105,7 @@ def read_data_train(dataset_path, debug=False):
             # mat file with annotations
             annot_file = os.path.join(seq_path, 'annot.mat')
             annot2 = sio.loadmat(annot_file)['annot2']
-            annot3 = sio.loadmat(annot_file)['annot3']
+            annot3 = sio.loadmat(annot_file)['univ_annot3']
             # calibration file and camera parameters
             for j, vid_i in enumerate(vid_list):
                 # image folder
@@ -125,10 +125,9 @@ def read_data_train(dataset_path, debug=False):
                     img_name = img_i.split('/')[-1]
                     joints_2d_raw = np.reshape(annot2[vid_i][0][i], (1, 28, 2))
                     joints_2d_raw= np.append(joints_2d_raw, np.ones((1,28,1)), axis=2)
-                    joints_2d = convert_kps(joints_2d_raw, "mpii3d",  "spin").reshape((-1,3))
 
                     # convert back to mpii format, for using with pytorch-pose-hg-3d
-                    joints_2d = convert_kps(joints_2d.reshape((1, -1, 3)), "spin", "mpii").reshape((-1,3))
+                    joints_2d = joints_2d_raw.reshape((-1,3))[INDEX_MPII3D_TO_MPII]
 
                     # visualize = True
                     # if visualize == True and i == 500:
@@ -154,17 +153,16 @@ def read_data_train(dataset_path, debug=False):
                     #     plt.imshow(frame)
                     #     plt.show()
 
-                    joints_3d_raw = np.reshape(annot3[vid_i][0][i], (1, 28, 3)) / 1000
-                    joints_3d = convert_kps(joints_3d_raw, "mpii3d", "spin").reshape((-1,3))
+                    joints_3d_raw = np.reshape(annot3[vid_i][0][i], (1, 28, 3))
+                    # convert back to mpii format, for using with pytorch-pose-hg-3d
+                    joints_3d = joints_3d_raw.reshape((-1,3))[INDEX_MPII3D_TO_MPII]
+                    joints_3d = joints_3d - joints_3d[6]  # 6 is the root in mpii
+
+                    # joint_3d_image is [image_coord_x, image_coord_y, depth-root depth]
+                    joints_3d_image = joints_2d.copy()
+                    joints_3d_image[:, 2] = joints_3d[:, 2]
 
                     bbox = get_bbox_from_kp2d(joints_2d[~np.all(joints_2d == 0, axis=1)]).reshape(4)
-
-                    joints_3d_absolute = joints_3d
-                    joints_3d = joints_3d - joints_3d[39]  # 4 is the root
-                    
-                    # convert back to mpii format, for using with pytorch-pose-hg-3d
-                    joints_3d = convert_kps(joints_3d.reshape((1, -1, 3)), "spin", "mpii").reshape((-1,3))
-                    joints_3d_absolute = convert_kps(joints_3d_absolute.reshape((1, -1, 3)), "spin", "mpii").reshape((-1,3))
 
                     # check that all joints are visible
                     x_in = np.logical_and(joints_2d[:, 0] < w, joints_2d[:, 0] >= 0)
@@ -180,7 +178,7 @@ def read_data_train(dataset_path, debug=False):
                     dataset['img_name'].append(img_i)
                     dataset['joints2D'].append(joints_2d)
                     dataset['joints3D'].append(joints_3d)
-                    dataset['joints3D_absolute'].append(joints_3d_absolute)
+                    dataset['joints3D_image'].append(joints_3d_image)
                     dataset['bbox'].append(bbox)
                     vid_segments.append(vid_uniq_id)
                     vid_used_frames.append(img_i)
@@ -213,7 +211,7 @@ def read_test_data(dataset_path):
         'vid_name': [],
         'frame_id': [],
         'joints3D': [],
-        'joints3D_absolute': [],
+        'joints3D_image': [],
         'joints2D': [],
         'bbox': [],
         'img_name': [],
@@ -253,11 +251,8 @@ def read_test_data(dataset_path):
             joints_2d_raw = np.expand_dims(annot2[frame_i, 0, :, :], axis = 0)
             joints_2d_raw = np.append(joints_2d_raw, np.ones((1, 17, 1)), axis=2)
 
-
-            joints_2d = convert_kps(joints_2d_raw, src="mpii3d_test", dst="spin").reshape((-1, 3))
-
             # convert back to mpii format, for using with pytorch-pose-hg-3d
-            joints_2d = convert_kps(joints_2d.reshape((1, -1, 3)), "spin", "mpii").reshape((-1,3))
+            joints_2d = joints_2d_raw.reshape((-1,3))[INDEX_MPII3D_TEST_TO_MPII]
 
             # visualize = True
             # if visualize == True:
@@ -282,18 +277,16 @@ def read_test_data(dataset_path):
             #     plt.imshow(frame)
             #     plt.show()
 
-            joints_3d_raw = np.reshape(annot3[frame_i, 0, :, :], (1, 17, 3)) / 1000
-            joints_3d = convert_kps(joints_3d_raw, "mpii3d_test", "spin").reshape((-1, 3))
-
-            joints_3d_absolute = joints_3d
-            joints_3d = joints_3d - joints_3d[39] # substract pelvis zero is the root for test
-            
+            joints_3d_raw = np.reshape(annot3[frame_i, 0, :, :], (1, 17, 3))
             # convert back to mpii format, for using with pytorch-pose-hg-3d
-            joints_3d = convert_kps(joints_3d.reshape((1, -1, 3)), "spin", "mpii").reshape((-1,3))
-            joints_3d_absolute = convert_kps(joints_3d_absolute.reshape((1, -1, 3)), "spin", "mpii").reshape((-1,3))
+            joints_3d = joints_3d_raw.reshape((-1,3))[INDEX_MPII3D_TEST_TO_MPII]
+            joints_3d = joints_3d - joints_3d[6] # 6 is the root in mpii
+
+            # joint_3d_image is [image_coord_x, image_coord_y, depth-root depth]
+            joints_3d_image = joints_2d.copy()
+            joints_3d_image[:, 2] = joints_3d[:, 2]
 
             bbox = get_bbox_from_kp2d(joints_2d[~np.all(joints_2d == 0, axis=1)]).reshape(4)
-
 
             # check that all joints are visible
             img_file = os.path.join(dataset_path, img_i)
@@ -308,16 +301,14 @@ def read_test_data(dataset_path):
                               str(int(dataset['vid_name'][-1].split("_")[-1][3:]) + 1)
                 continue
 
-
             dataset['vid_name'].append(vid_uniq_id)
             dataset['frame_id'].append(img_file.split("/")[-1].split(".")[0])
             dataset['img_name'].append(img_file)
             dataset['joints2D'].append(joints_2d)
             dataset['joints3D'].append(joints_3d)
-            dataset['joints3D_absolute'].append(joints_3d_absolute)
+            dataset['joints3D_image'].append(joints_3d_image)
             dataset['bbox'].append(bbox)
             dataset['valid_i'].append(valid_i)
-
             vid_segments.append(vid_uniq_id)
             vid_used_frames.append(img_file)
             vid_used_joints.append(joints_2d)

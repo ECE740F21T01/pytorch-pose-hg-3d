@@ -16,6 +16,11 @@
 
 import numpy as np
 
+INDEX_MPII3D_TO_MPII = [25, 24, 23, 18, 19, 20, 4, 3, 5, 7, 16, 15, 14, 9, 10, 11]
+INDEX_MPII3D_TEST_TO_MPII = [10, 9, 8, 11, 12, 13, 14, 15, 1, 0, 4, 3, 2, 5, 6, 7]
+
+INDEX_H36M_TO_MPII = [6, 5, 4, 1, 2, 3, 0, 7, 8, 10, 16, 15, 14, 11, 12, 13]
+
 def keypoint_hflip(kp, img_width):
     # Flip a keypoint horizontally around the y-axis
     # kp N,2
@@ -724,3 +729,25 @@ def get_smpl_skeleton():
             [21, 23],
         ]
     )
+
+def get_coco18_joint_names():
+    return [
+        "nose",      # 0
+        "leye",      # 1
+        "reye",      # 2
+        "lear",      # 3
+        "rear",      # 4
+        "lshoulder", # 5
+        "rshoulder", # 6
+        "lelbow",    # 7
+        "relbow",    # 8
+        "lwrist",    # 9
+        "rwrist",    # 10
+        "lhip",      # 11
+        "rhip",      # 12
+        "lknee",     # 13
+        "rknee",     # 14
+        "lankle",    # 15
+        "rankle",    # 16
+        "pelvis" # 17 pelvis (COCO orignaly have 17 joints, 3dpw 2d annotation uses 18 joints)
+    ]
