@@ -23,5 +23,19 @@ pip install "git+https://github.com/philferriere/cocoapi.git#egg=pycocotools&sub
 
 # datasets:
 # MPII:
-ln -s /data/keith/datasets/mpii_human_pose_v1/annot ~/HDD/projects/ECE740/pytorch-pose-hg-3d/data/mpii/
-ln -s /data/keith/datasets/mpii_human_pose_v1/images ~/HDD/projects/ECE740/pytorch-pose-hg-3d/data/mpii/
+ln -s /data/keith/datasets/mpii_human_pose_v1/annot /data/liyao/projects/ECE740/pytorch-pose-hg-3d/data/mpii/
+ln -s /data/keith/datasets/mpii_human_pose_v1/images /data/liyao/projects/ECE740/pytorch-pose-hg-3d/data/mpii/
+# MPI-INF-3DHP:
+ln -s /data/liyao/datasets/mpi_inf_3dhp /data/liyao/projects/ECE740/pytorch-pose-hg-3d/data/
+# 3DPW:
+ln -s /data/ruichen/imageFiles /data/liyao/projects/ECE740/pytorch-pose-hg-3d/data/3dpw/
+ln -s /data/ruichen/sequenceFiles /data/liyao/projects/ECE740/pytorch-pose-hg-3d/data/3dpw/
+
+# Install additional envs from VIBE:
+# pip install numpy==1.17.5 torch==1.4.0 torchvision==0.5.0
+pip install git+https://github.com/giacaglia/pytube.git --upgrade
+pip install -r lib/vibe_requirements.txt  --ignore-installed certifi
+
+# VIBE prepares MPI-INF-3DHP:
+source scripts/prepare_data.sh
+source scripts/prepare_training_data.sh
