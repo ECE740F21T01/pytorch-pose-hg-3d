@@ -11,10 +11,16 @@ class Fusion3D(data.Dataset):
     self.opt = opt
     self.ratio3D = 1
     self.split = split
-    self.dataset3D = H36M(opt, split)
-    # self.dataset3D = MPII3D(opt, split)
-    # self.dataset3D = ThreeDPW(opt, split)
-
+    
+    if opt.dataset3D == "MPII3D":
+        self.dataset3D = MPII3D(opt, split)
+    elif opt.dataset3D == "3DPW":
+        self.dataset3D = ThreeDPW(opt, split)
+    elif opt.dataset3D == "H36M":
+        self.dataset3D = H36M(opt, split)
+    else:
+        self.dataset3D = H36M(opt, split)
+    
     if self.split == 'train':
       self.dataset2D = MPII(opt, split)
       self.nImages2D = len(self.dataset2D)
@@ -33,6 +39,10 @@ class Fusion3D(data.Dataset):
     self.std = self.dataset3D.std
     self.convert_eval_format = self.dataset3D.convert_eval_format
     print('#Images2D {}, #Images3D {}'.format(self.nImages2D, self.nImages3D))
+    if self.nImages2D > 0:
+        print("dataset2D: ", self.dataset2D.__class__.__name__)
+    if self.nImages3D > 0:
+        print("dataset3D: ", self.dataset3D.__class__.__name__)
 
   def __getitem__(self, index):
     if index < self.nImages3D:

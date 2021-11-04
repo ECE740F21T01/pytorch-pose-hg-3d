@@ -25,6 +25,9 @@ pip install "git+https://github.com/philferriere/cocoapi.git#egg=pycocotools&sub
 # MPII:
 ln -s /data/keith/datasets/mpii_human_pose_v1/annot /data/liyao/projects/ECE740/pytorch-pose-hg-3d/data/mpii/
 ln -s /data/keith/datasets/mpii_human_pose_v1/images /data/liyao/projects/ECE740/pytorch-pose-hg-3d/data/mpii/
+# H36M:
+ln -s /data/liyao/datasets/h36m/ECCV18_Challenge /data/liyao/projects/ECE740/pytorch-pose-hg-3d/data/h36m/
+ln -s /data/liyao/datasets/h36m/msra_cache /data/liyao/projects/ECE740/pytorch-pose-hg-3d/data/h36m/
 # MPI-INF-3DHP:
 ln -s /data/liyao/datasets/mpi_inf_3dhp /data/liyao/projects/ECE740/pytorch-pose-hg-3d/data/
 # 3DPW:

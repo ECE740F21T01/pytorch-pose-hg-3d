@@ -54,6 +54,9 @@ class opts():
     self.parser.add_argument('--output_h', type = int, default = -1)
     self.parser.add_argument('--output_w', type = int, default = -1)
 
+    self.parser.add_argument('--dataset3D', default = 'H36M', 
+                             help = 'H36M | MPII3D | 3DPW')
+
   def parse(self, args = ''):
     if args == '':
       opt = self.parser.parse_args()
