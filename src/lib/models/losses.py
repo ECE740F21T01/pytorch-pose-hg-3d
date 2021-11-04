@@ -2,6 +2,9 @@ import torch
 import torch.nn as nn
 from torch.autograd import Function
 import numpy as np
+import warnings
+warnings.filterwarnings("ignore")
+
 
 def _gather_feat(feat, ind, mask=None):
     dim  = feat.size(2)
@@ -145,11 +148,11 @@ class VarLoss(Function):
           for j in range(N):
             if l[j] > 0:
               id1, id2 = self.skeleton_idx[g][j]
-              grad_input[t][id1] += self.var_weight * \
+              grad_input[t][id1] += (self.var_weight * \
                 self.skeleton_weight[g][j] ** 2 / num * (l[j] - E) \
-                / l[j] * (input[t, id1] - input[t, id2]) / batch_size
-              grad_input[t][id2] += self.var_weight * \
+                / l[j] * (input[t, id1] - input[t, id2]) / batch_size).cpu()
+              grad_input[t][id2] += (self.var_weight * \
                 self.skeleton_weight[g][j] ** 2 / num * (l[j] - E) \
-                / l[j] * (input[t, id2] - input[t, id1]) / batch_size
+                / l[j] * (input[t, id2] - input[t, id1]) / batch_size).cpu()
     grad_input = grad_input.cuda(self.device, non_blocking=True)
     return grad_input, None, None, None

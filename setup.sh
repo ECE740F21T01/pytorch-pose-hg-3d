@@ -13,6 +13,7 @@ PYTORCH=/home/liyao/HDD/anaconda3/envs/pose-hg-3d/lib/python3.6/site-packages/
 sed -i "1254s/torch\.backends\.cudnn\.enabled/False/g" ${PYTORCH}/torch/nn/functional.py
 
 pip install tensorflow # tensorboard
+pip install tensorboardX
 pip install matplotlib
 pip install scipy
 
