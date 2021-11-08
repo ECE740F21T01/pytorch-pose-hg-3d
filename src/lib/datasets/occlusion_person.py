@@ -1,11 +1,12 @@
 '''
 Modified from "src/lib/datasets/h36m.py"
-By changing to load the 3DPW (threedpw) dataset from "data/vibe_db/3dpw_train_db.pt" or "data/vibe_db/3dpw_val_db.pt"
-in the __init__ function.
+
+By changing to load the Occlusion-Person (occulusion_person) dataset .pkl annotation files from data/occlusion_person in the __init__ function.
+The images and annotations in data/occlusion_person are open-sourced by: https://github.com/zhezh/occlusion_person
 
 Changed _get_part_info to load the correct format labels
 
-Changed _load_image to load from path given in the .pt file
+Changed _load_image to load from path given in the .pkl file
 '''
 import os
 import torch.utils.data as data
@@ -14,13 +15,69 @@ import torch
 import json
 import cv2
 import pickle
-import joblib
 from utils.image import flip, shuffle_lr
 from utils.image import draw_gaussian, adjust_aspect_ratio
 from utils.image import get_affine_transform, affine_transform
 from utils.image import transform_preds
 
-class ThreeDPW(data.Dataset):
+def get_unrealcv_joint_names():
+    # Referenced: https://github.com/zhezh/adafuse-3d-human-pose/blob/main/lib/dataset/unrealcv_dataset.py
+    return [
+        'hip', # 0
+        'rhip', # 1
+        'rknee', # 2
+        'rankle', # 3
+        'lhip', # 4
+        'lknee', # 5
+        'lankle', # 6
+        'belly', # 7
+        'neck', # 8
+        'lshoulder', # 9
+        'lelbow', # 10
+        'lwrist', # 11
+        'rshoulder', # 12
+        'relbow', # 13
+        'rwrist', # 14
+    ]
+
+def get_mpii_joint_names():
+    return [
+        'rankle', # 0
+        'rknee', # 1
+        'rhip', # 2
+        'lhip', # 3
+        'lknee', # 4
+        'lankle', # 5
+        'hip', # 6
+        'thorax', # 7
+        'neck', # 8
+        'headtop', # 9
+        'rwrist', # 10
+        'relbow', # 11
+        'rshoulder', # 12
+        'lshoulder', # 13
+        'lelbow', # 14
+        'lwrist', # 15
+    ]
+
+def convert_kps_unrealcv_mpii(in_joints):
+    src_names = eval(f'get_unrealcv_joint_names')()
+    dst_names = eval(f'get_mpii_joint_names')()
+    
+    out_joints = np.zeros((len(dst_names), in_joints.shape[1]), dtype=np.float32)
+
+    for idx, jn in enumerate(dst_names):
+        # need to infer "thorax", "headtop" from other existing joints
+        if jn in src_names:
+            out_joints[idx, :] = in_joints[src_names.index(jn), :]
+        elif jn == "thorax":
+            out_joints[idx, :] = (in_joints[src_names.index("lshoulder"), :] + in_joints[src_names.index("rshoulder"), :]) * 0.5
+        elif jn == "headtop":
+            out_joints[idx, :] = in_joints[src_names.index("neck"), :]
+
+    return out_joints
+
+class OcclusionPerson(data.Dataset):
   def __init__(self, opt, split):
     print('==> initializing 3D {} data.'.format(split))
     self.num_joints = 16
@@ -47,11 +104,15 @@ class ThreeDPW(data.Dataset):
     self.split = split
     self.opt = opt
 
+    self.split_to_name = {"train": "train", "val": "validation"}
     ann_path = os.path.join(
-      self.opt.data_dir, 'vibe_db', '3dpw_{}_db.pt'.format(self.split))
-    self.annot = joblib.load(ann_path)
-    self.annot = [dict(zip(self.annot,t)) for t in zip(*(self.annot).values())] # convert dict of lists, to list of dicts
-    # keys in dataset: dict_keys(['vid_name', 'frame_id', 'joints3D', 'joints3D_absolute', 'joints2D', 'shape', 'pose', 'bbox', 'img_name', 'valid'])
+      self.opt.data_dir, 'occlusion_person', 'unrealcv_{}.pkl'.format(self.split_to_name[self.split]))
+
+    with open(ann_path, "rb") as f:
+        self.annot = pickle.load(f)
+    # keys in dataset: dict_keys(['image', 'joints_2d', 'joints_3d', 'joints_vis', 'joints_vis_2d', 
+    #                             'center', 'scale', 'box', 'video_id', 'image_id', 'subject', 'action', 'subaction',
+    #                             'camera_id', 'camera', 'source', 'joints_gt', 'kps_all'])
 
     # dowmsample validation data
     self.idxs = np.arange(len(self.annot)) if split == 'train' \
@@ -60,20 +121,34 @@ class ThreeDPW(data.Dataset):
     print('Loaded 3D {} {} samples'.format(split, self.num_samples))
 
   def _load_image(self, index):
-    path = os.path.join(self.opt.data_dir, '..', self.annot[index]['img_name'])
+    path = os.path.join(self.opt.data_dir, 'occlusion_person', "images", self.annot[index]['image'])
     img = cv2.imread(path)
     return img
   
   def _get_part_info(self, index):
-    # keys in dataset: dict_keys(['vid_name', 'frame_id', 'joints3D', 'joints3D_absolute', 'joints2D', 'shape', 'pose', 'bbox', 'img_name', 'valid'])
-    # bbox = [c_x, c_y, w, h]
-    # change to use 3dpw format.
+    # keys in dataset: dict_keys(['image', 'joints_2d', 'joints_3d', 'joints_vis', 'joints_vis_2d', 
+    #                             'center', 'scale', 'box', 'video_id', 'image_id', 'subject', 'action', 'subaction',
+    #                             'camera_id', 'camera', 'source', 'joints_gt', 'kps_all'])
+    # change to convert unrealcv (occulusion-person) format to mpii format.
     ann = self.annot[self.idxs[index]]
-    gt_3d = np.array(ann['joints3D'], np.float32) # relative joint coordinates, relative to pelvis, in mpii format (16 joints)
+    
+    # gt_3d: [X-root, Y-root, Z-root] in camera coordinate
+    gt_3d = np.array(ann['joints_3d'], np.float32) # in occulusion-person (unrealcv) format, in camera coordinate system
+    gt_3d = convert_kps_unrealcv_mpii(gt_3d) # convert to mpii format (16 joints)
+    gt_3d = gt_3d - gt_3d[6] # relative joint coordinates, relative to pelvis, by subtracting pelvis/(hip)/(root)
+    pts_3d = gt_3d.copy()
     gt_3d = gt_3d[self.mpii_to_h36m][:17] # relative joint coordinates, relative to pelvis, converted to H36M format (17 joints)
-    pts = np.array(ann['joints3D_image'], np.float32) # j3d_image is [image_coord_x, image_coord_y, depth-root depth], in mpii format (16 joints)
-    c = np.array([ann['bbox'][0], ann['bbox'][1]], dtype=np.float32) # c_x, c_y for bbox
-    s = max(ann['bbox'][2], ann['bbox'][3]) # w, h for bbox
+    
+    # pts: [org_img_x, org_img_y, depth - root_depth] in mpii format (16 joints)
+    pts = np.zeros(pts_3d.shape, dtype=np.float32)
+    pts_2d = np.array(ann['joints_2d'], np.float32)
+    pts_2d = convert_kps_unrealcv_mpii(pts_2d)
+    pts[:, 0:2] = pts_2d[:, 0:2] # org_img_x, org_img_y
+    pts[:, 2] = pts_3d[:, 2] # depth - root_depth
+    
+    c = np.array([ann['center'][0], ann['center'][1]], dtype=np.float32) # c_x, c_y
+    s = max(ann['scale'][0]*200, ann['scale'][1]*200) # w, h for bbox (for occulusion-person need to multiply scale with 200)
+    
     return gt_3d, pts, c, s
       
   def __getitem__(self, index):

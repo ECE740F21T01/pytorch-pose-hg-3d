@@ -34,6 +34,8 @@ ln -s /data/liyao/datasets/mpi_inf_3dhp /data/liyao/projects/ECE740/pytorch-pose
 # 3DPW:
 ln -s /data/ruichen/imageFiles /data/liyao/projects/ECE740/pytorch-pose-hg-3d/data/3dpw/
 ln -s /data/ruichen/sequenceFiles /data/liyao/projects/ECE740/pytorch-pose-hg-3d/data/3dpw/
+# Occlusion-Person
+ln -s /data/keith/datasets/occlusion_person /data/liyao/projects/ECE740/pytorch-pose-hg-3d/data/
 
 # Install additional envs from VIBE:
 # pip install numpy==1.17.5 torch==1.4.0 torchvision==0.5.0

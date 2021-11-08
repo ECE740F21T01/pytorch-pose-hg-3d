@@ -5,6 +5,7 @@ from .mpii import MPII
 from .h36m import H36M
 from .mpii3d import MPII3D
 from .threedpw import ThreeDPW
+from .occlusion_person import OcclusionPerson
 
 class Fusion3D(data.Dataset):
   def __init__(self, opt, split):
@@ -16,6 +17,8 @@ class Fusion3D(data.Dataset):
         self.dataset3D = MPII3D(opt, split)
     elif opt.dataset3D == "3DPW":
         self.dataset3D = ThreeDPW(opt, split)
+    elif opt.dataset3D == "OcclusionPerson":
+        self.dataset3D = OcclusionPerson(opt, split)
     elif opt.dataset3D == "H36M":
         self.dataset3D = H36M(opt, split)
     else:
