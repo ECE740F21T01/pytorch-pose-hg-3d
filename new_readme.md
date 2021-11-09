@@ -1,3 +1,23 @@
+## For setting up environment and link to dataset:
+Please refer to `setup.sh`
+
+## Compatible Datasets:
+
+2D Pretraining:
+- MPII
+
+3D Finetuning:
+- Human3.6M (a.k.a. H36M)
+- MPI-INF-3DHP (a.k.a. MPII3D)
+- 3DPW
+- Occlusion-Person (a.k.a. OcclusionPerson)
+
+To choose which 3D dataset for evaluation and training, add this argument
+```
+self.parser.add_argument('--dataset3D', default = 'H36M', 
+                             help = 'H36M | MPII3D | 3DPW | OcclusionPerson')
+```
+
 ## References:
 
 The original code of this project is adpoted from:
@@ -40,5 +60,5 @@ The code for MPI-INF-3DHP dataset preparing is adpoted from:
     - Some functions are borrowed from [Kornia](https://github.com/kornia/kornia).
     - Pose tracker is from [STAF](https://github.com/soulslicer/openpose/tree/staf)."
     
-The ./lib folder holds the code from VIBE repo, for the MPI-INF-3DHP dataset dataloader
+The ./lib folder holds the code from VIBE repo, for the 3DPW and MPI-INF-3DHP dataset dataloader.
 
