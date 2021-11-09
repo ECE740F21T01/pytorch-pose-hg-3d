@@ -32,8 +32,8 @@ ln -s /data/liyao/datasets/h36m/msra_cache /data/liyao/projects/ECE740/pytorch-p
 # MPI-INF-3DHP:
 ln -s /data/liyao/datasets/mpi_inf_3dhp /data/liyao/projects/ECE740/pytorch-pose-hg-3d/data/
 # 3DPW:
-ln -s /data/ruichen/imageFiles /data/liyao/projects/ECE740/pytorch-pose-hg-3d/data/3dpw/
-ln -s /data/ruichen/sequenceFiles /data/liyao/projects/ECE740/pytorch-pose-hg-3d/data/3dpw/
+ln -s /data/keith/datasets/3DPW/imageFiles /data/liyao/projects/ECE740/pytorch-pose-hg-3d/data/3dpw/
+ln -s /data/keith/datasets/3DPW/sequenceFiles /data/liyao/projects/ECE740/pytorch-pose-hg-3d/data/3dpw/
 # Occlusion-Person
 ln -s /data/keith/datasets/occlusion_person /data/liyao/projects/ECE740/pytorch-pose-hg-3d/data/
 
@@ -43,5 +43,6 @@ pip install git+https://github.com/giacaglia/pytube.git --upgrade
 pip install -r lib/vibe_requirements.txt  --ignore-installed certifi
 
 # VIBE prepares MPI-INF-3DHP:
+# or skip these two lines by copying from /data/liyao/projects/ECE740/pytorch-pose-hg-3d/data/vibe_db/* to your pytorch-pose-hg-3d/data/vibe_db
 source scripts/prepare_data.sh
 source scripts/prepare_training_data.sh
