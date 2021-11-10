@@ -19,6 +19,7 @@ from utils.image import flip, shuffle_lr
 from utils.image import draw_gaussian, adjust_aspect_ratio
 from utils.image import get_affine_transform, affine_transform
 from utils.image import transform_preds
+from pathlib import Path
 
 class ThreeDPW(data.Dataset):
   def __init__(self, opt, split):
@@ -60,8 +61,9 @@ class ThreeDPW(data.Dataset):
     print('Loaded 3D {} {} samples'.format(split, self.num_samples))
 
   def _load_image(self, index):
-    path = os.path.join(self.opt.data_dir, '..', self.annot[index]['img_name'])
-    img = cv2.imread(path)
+    path = Path(os.path.join(self.opt.data_dir, '..', self.annot[index]['img_name']))
+    #path = Path(os.path.join('..', self.annot[index]['img_name']))
+    img = cv2.imread(str(path))
     return img
   
   def _get_part_info(self, index):

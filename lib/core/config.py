@@ -33,7 +33,7 @@ cfg = CN()
 
 cfg.OUTPUT_DIR = 'results'
 cfg.EXP_NAME = 'default'
-cfg.DEVICE = 'cuda'
+cfg.DEVICE = 'cuda'  # TODO CUDA here
 cfg.DEBUG = True
 cfg.LOGDIR = ''
 cfg.NUM_WORKERS = 8

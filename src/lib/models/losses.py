@@ -119,7 +119,7 @@ class VarLoss(Function):
           output += loss 
     output = self.var_weight * output / batch_size
     self.save_for_backward(input, visible, mask, gt_2d)
-    output = output.cuda(self.device, non_blocking=True)
+    output = output.cuda(self.device, non_blocking=True)  # TODO CUDA
     return output
     
   def backward(self, grad_output):
@@ -154,5 +154,5 @@ class VarLoss(Function):
               grad_input[t][id2] += (self.var_weight * \
                 self.skeleton_weight[g][j] ** 2 / num * (l[j] - E) \
                 / l[j] * (input[t, id2] - input[t, id1]) / batch_size).cpu()
-    grad_input = grad_input.cuda(self.device, non_blocking=True)
+    grad_input = grad_input.cuda(self.device, non_blocking=True)  # TODO CUDA
     return grad_input, None, None, None

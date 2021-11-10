@@ -354,7 +354,7 @@ def perspective_projection(points, rotation, translation,
 
 
 def get_pretrained_hmr():
-    device = 'cuda'
+    device = 'cuda'  # TODO CUDA
     model = hmr().to(device)
     checkpoint = torch.load(osp.join(VIBE_DATA_DIR, 'spin_model_checkpoint.pth.tar'))
     model.load_state_dict(checkpoint['model'], strict=False)

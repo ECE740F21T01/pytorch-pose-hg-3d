@@ -53,7 +53,7 @@ def main(opt):
   if opt.load_model == '':
     opt.load_model = '../models/fusion_3d_var.pth'
   if opt.gpus[0] >= 0:
-    opt.device = torch.device('cuda:{}'.format(opt.gpus[0]))
+    opt.device = torch.device('cuda:{}'.format(opt.gpus[0]))  # TODO CUDA
   else:
     opt.device = torch.device('cpu')
   

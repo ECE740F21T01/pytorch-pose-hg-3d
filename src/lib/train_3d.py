@@ -39,8 +39,8 @@ def step(split, epoch, opt, data_loader, model, optimizer=None):
     data_time.update(time.time() - end)
     for k in batch:
       if k != 'meta':
-        batch[k] = batch[k].cuda(device=opt.device, non_blocking=True)
-    gt_2d = batch['meta']['pts_crop'].cuda(
+        batch[k] = batch[k].cuda(device=opt.device, non_blocking=True)  # TODO CUDA
+    gt_2d = batch['meta']['pts_crop'].cuda(  # TODO CUDA
       device=opt.device, non_blocking=True).float() / opt.output_h
     output = model(batch['input'])
 
@@ -49,6 +49,7 @@ def step(split, epoch, opt, data_loader, model, optimizer=None):
       output[-1]['depth'], batch['reg_mask'], batch['reg_ind'], 
       batch['reg_target'],gt_2d)
     for k in range(opt.num_stacks - 1):
+      #loss += crit(output[k]['hm'], batch['target'])
       loss += crit(output[k], batch['target'])
       loss_3d = crit_3d(
         output[-1]['depth'], batch['reg_mask'], batch['reg_ind'], 
@@ -62,7 +63,7 @@ def step(split, epoch, opt, data_loader, model, optimizer=None):
     else:
       input_ = batch['input'].cpu().numpy().copy()
       input_[0] = flip(input_[0]).copy()[np.newaxis, ...]
-      input_flip_var = torch.from_numpy(input_).cuda(
+      input_flip_var = torch.from_numpy(input_).cuda(  # TODO CUDA
         device=opt.device, non_blocking=True)
       output_flip_ = model(input_flip_var)
       output_flip = shuffle_lr(
@@ -73,9 +74,9 @@ def step(split, epoch, opt, data_loader, model, optimizer=None):
         flip(output_flip_[-1]['depth'].detach().cpu().numpy()[0]), shuffle_ref)
       output_depth_flip = output_depth_flip.reshape(
         1, opt.num_output, opt.output_h, opt.output_w)
-      output_flip = torch.from_numpy(output_flip).cuda(
+      output_flip = torch.from_numpy(output_flip).cuda(  # TODO CUDA
         device=opt.device, non_blocking=True)
-      output_depth_flip = torch.from_numpy(output_depth_flip).cuda(
+      output_depth_flip = torch.from_numpy(output_depth_flip).cuda(  # TODO CUDA
         device=opt.device, non_blocking=True)
       output[-1]['hm'] = (output[-1]['hm'] + output_flip) / 2
       output[-1]['depth'] = (output[-1]['depth'] + output_depth_flip) / 2
