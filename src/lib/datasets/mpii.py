@@ -8,6 +8,7 @@ from utils.image import flip, shuffle_lr
 from utils.image import draw_gaussian, adjust_aspect_ratio
 from utils.image import get_affine_transform, affine_transform
 from utils.image import transform_preds
+from pathlib import Path
 
 class MPII(data.Dataset):
   def __init__(self, opt, split):
@@ -24,7 +25,7 @@ class MPII(data.Dataset):
     annot = {}
     tags = ['image','joints','center','scale']
     self.data_path = os.path.join(opt.data_dir, 'mpii')
-    f = json.load(open('{}/annot/{}.json'.format(self.data_path, split), 'r'))
+    f = json.load(open(Path('{}\\annot\\{}.json'.format(self.data_path, split)), 'r'))
     self.num_samples = len(f)
     for tag in tags:
       annot[tag] = []

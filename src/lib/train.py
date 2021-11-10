@@ -39,8 +39,12 @@ def step(split, epoch, opt, data_loader, model, optimizer=None):
     output = model(input_var)
 
     loss = crit(output[-1]['hm'], target_var)
+#    print("loss shape at init: {}".format(loss.shape))
     for k in range(opt.num_stacks - 1):
-      loss += crit(output[k], target_var)
+#      print("Len of output")
+#      print(len(output))
+      loss += crit(output[k]['hm'], target_var)
+#    print("loss after for loop: {}".format(loss.shape))
 
     if split == 'train':
       optimizer.zero_grad()
@@ -62,8 +66,11 @@ def step(split, epoch, opt, data_loader, model, optimizer=None):
       output[-1]['hm'] = (output[-1]['hm'] + output_flip) / 2
       pred, conf = get_preds(output[-1]['hm'].detach().cpu().numpy(), True)
       preds.append(convert_eval_format(pred, conf, meta)[0])
-    
-    Loss.update(loss.detach()[0], input.size(0))
+
+#    print(loss.shape)
+#    print(input.shape)
+#    Loss.update(loss.detach()[0], input.size(0))
+    Loss.update(loss.item(), input.size(0))
     Acc.update(accuracy(output[-1]['hm'].detach().cpu().numpy(), 
                         target_var.detach().cpu().numpy(), acc_idxs))
    

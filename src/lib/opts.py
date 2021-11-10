@@ -69,7 +69,8 @@ class opts():
     opt.epsilon = 1e-8
     opt.hm_gauss = 2
     opt.root_dir = os.path.join(os.path.dirname(__file__), '..', '..')
-    opt.data_dir = os.path.join(opt.root_dir, 'data')
+    opt.data_dir = "D:\\Documents\\Research\\ECE740DS\\"
+    #opt.data_dir = os.path.join(opt.root_dir, 'data')
     opt.exp_dir = os.path.join(opt.root_dir, 'exp')
 
     opt.save_dir = os.path.join(opt.exp_dir, opt.exp_id)
@@ -85,7 +86,7 @@ class opts():
     if 'hg' in opt.arch or 'posenet' in opt.arch:
       opt.num_stacks = 2
     else:
-      opt.num_stacks = 1
+      opt.num_stacks = 2#1
     
     if opt.input_h == -1 and opt.input_w == -1 and \
       opt.output_h == -1 and opt.output_w == -1:
