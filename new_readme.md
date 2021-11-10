@@ -38,7 +38,7 @@ The original code of this project is adpoted from:
     year = {2017}
     }
 
-The code for MPI-INF-3DHP dataset preparing is adpoted from:
+The code for MPI-INF-3DHP and 3DPW dataset preparing is adpoted from:
     
     VIBE: Video Inference for Human Body Pose and Shape Estimation [CVPR-2020]
     
@@ -62,3 +62,4 @@ The code for MPI-INF-3DHP dataset preparing is adpoted from:
     
 The ./lib folder holds the code from VIBE repo, for the 3DPW and MPI-INF-3DHP dataset dataloader.
 
+For LSP-Extended Dataloader referenced: https://github.com/bmartacho/UniPose/blob/master/utils/lsp_lspet_data.py

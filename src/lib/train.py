@@ -63,7 +63,7 @@ def step(split, epoch, opt, data_loader, model, optimizer=None):
       pred, conf = get_preds(output[-1]['hm'].detach().cpu().numpy(), True)
       preds.append(convert_eval_format(pred, conf, meta)[0])
     
-    Loss.update(loss.detach()[0], input.size(0))
+    Loss.update(loss.item(), input.size(0))
     Acc.update(accuracy(output[-1]['hm'].detach().cpu().numpy(), 
                         target_var.detach().cpu().numpy(), acc_idxs))
    

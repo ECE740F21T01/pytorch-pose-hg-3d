@@ -36,6 +36,11 @@ ln -s /data/keith/datasets/3DPW/imageFiles /data/liyao/projects/ECE740/pytorch-p
 ln -s /data/keith/datasets/3DPW/sequenceFiles /data/liyao/projects/ECE740/pytorch-pose-hg-3d/data/3dpw/
 # Occlusion-Person
 ln -s /data/keith/datasets/occlusion_person /data/liyao/projects/ECE740/pytorch-pose-hg-3d/data/
+# LSP-Extended
+ln -s  /data/keith/datasets/lsp_extended/ /data/liyao/projects/ECE740/pytorch-pose-hg-3d/data/lsp_extended
+ln -s  /data/keith/datasets/lsp/ /data/liyao/projects/ECE740/pytorch-pose-hg-3d/data/lsp
+# FLIC-Full
+ln -s 
 
 # Install additional envs from VIBE:
 # pip install numpy==1.17.5 torch==1.4.0 torchvision==0.5.0
