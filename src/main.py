@@ -12,6 +12,7 @@ from opts import opts
 from model import create_model, save_model
 from datasets.mpii import MPII
 from datasets.coco import COCO
+from datasets.flic import FLIC
 from datasets.fusion_3d import Fusion3D
 from logger import Logger
 from train import train, val
@@ -21,7 +22,8 @@ import scipy.io as sio
 dataset_factory = {
   'mpii': MPII,
   'coco': COCO,
-  'fusion_3d': Fusion3D
+  'fusion_3d': Fusion3D,
+  'flic': FLIC
 }
 
 task_factory = {
