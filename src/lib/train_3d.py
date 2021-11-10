@@ -49,8 +49,7 @@ def step(split, epoch, opt, data_loader, model, optimizer=None):
       output[-1]['depth'], batch['reg_mask'], batch['reg_ind'], 
       batch['reg_target'],gt_2d)
     for k in range(opt.num_stacks - 1):
-      #loss += crit(output[k]['hm'], batch['target'])
-      loss += crit(output[k], batch['target'])
+      loss += crit(output[k]['hm'], batch['target'])
       loss_3d = crit_3d(
         output[-1]['depth'], batch['reg_mask'], batch['reg_ind'], 
         batch['reg_target'], gt_2d)

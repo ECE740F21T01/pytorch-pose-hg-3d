@@ -61,8 +61,8 @@ class ThreeDPW(data.Dataset):
     print('Loaded 3D {} {} samples'.format(split, self.num_samples))
 
   def _load_image(self, index):
-    path = Path(os.path.join(self.opt.data_dir, '..', self.annot[index]['img_name']))
-    #path = Path(os.path.join('..', self.annot[index]['img_name']))
+    #path = Path(os.path.join(self.opt.data_dir, '..', self.annot[index]['img_name']))
+    path = Path(os.path.join('..', self.annot[index]['img_name']))
     img = cv2.imread(str(path))
     return img
   
