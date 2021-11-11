@@ -16,6 +16,7 @@
 
 import argparse
 from yacs.config import CfgNode as CN
+import torch
 
 # CONSTANTS
 # You may modify them at will
@@ -33,7 +34,7 @@ cfg = CN()
 
 cfg.OUTPUT_DIR = 'results'
 cfg.EXP_NAME = 'default'
-cfg.DEVICE = 'cuda'  # TODO CUDA here
+cfg.DEVICE = 'cuda' if torch.cuda.is_available() else 'npu'  # TODO FIXED CUDA here
 cfg.DEBUG = True
 cfg.LOGDIR = ''
 cfg.NUM_WORKERS = 8

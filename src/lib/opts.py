@@ -86,7 +86,7 @@ class opts():
     if 'hg' in opt.arch or 'posenet' in opt.arch:
       opt.num_stacks = 2
     else:
-      opt.num_stacks = 2#1
+      opt.num_stacks = 1
     
     if opt.input_h == -1 and opt.input_w == -1 and \
       opt.output_h == -1 and opt.output_w == -1:
