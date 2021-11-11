@@ -51,9 +51,9 @@ class FLIC(data.Dataset):
         self.num_samples = len(f)
         for i in range(self.num_samples):
             annot['image'].append(f[i][tags_idx['image']][0])
-            # annot['scale'].append(f[i][tags_idx['scale']])
             # FLIC dataset doesn't has scale
-            annot['scale'].append(1)
+            # solve the 'scale' problem by: https://github.com/shihenw/convolutional-pose-machines-release/issues/49
+            annot['scale'].append(720 / 200)
             center = [(f[i][tags_idx['center']][0][0] + f[i][tags_idx['center']][0][1]) / 2,
             (f[i][tags_idx['center']][0][2] + f[i][tags_idx['center']][0][3]) / 2]
             annot['center'].append(center)
