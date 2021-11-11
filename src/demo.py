@@ -52,10 +52,12 @@ def main(opt):
   opt.heads['depth'] = opt.num_output
   if opt.load_model == '':
     opt.load_model = '../models/fusion_3d_var.pth'
-  if opt.gpus[0] >= 0:
+  if opt.gpus[0] >= 0 and torch.cuda.is_available():
     opt.device = torch.device('cuda:{}'.format(opt.gpus[0]))  # TODO CUDA
   else:
-    opt.device = torch.device('cpu')
+    opt.device = torch.device('npu:{}'.format(opt.gpus[0]))
+#  else:
+#    opt.device = torch.device('cpu')
   
   model, _, _ = create_model(opt)
   model = model.to(opt.device)

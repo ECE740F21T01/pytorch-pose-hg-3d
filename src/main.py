@@ -35,7 +35,10 @@ def main(opt):
     print('Cudnn is disabled.')
 
   logger = Logger(opt)
-  opt.device = torch.device('cuda:{}'.format(opt.gpus[0]))  # TODO CUDA
+  if torch.cuda.is_available():
+      opt.device = torch.device('cuda:{}'.format(opt.gpus[0]))  # TODO CUDA FIXED
+  else:
+      opt.device = torch.device('npu:{}'.format(opt.gpus[0]))
 
   Dataset = dataset_factory[opt.dataset]
   train, val = task_factory[opt.task]
@@ -43,9 +46,9 @@ def main(opt):
   model, optimizer, start_epoch = create_model(opt)
  
   if len(opt.gpus) > 1:
-    model = torch.nn.DataParallel(model, device_ids=opt.gpus).cuda(opt.device)  # TODO CUDA
+    model = torch.nn.DataParallel(model, device_ids=opt.gpus).to(opt.device)  # TODO CUDA fixed...?
   else:
-    model = model.cuda(opt.device)  # TODO CUDA
+    model = model.to(opt.device)  # TODO CUDA fixed...?
 
   val_loader = torch.utils.data.DataLoader(
       Dataset(opt, 'val'), 

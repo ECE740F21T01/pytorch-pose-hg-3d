@@ -33,8 +33,8 @@ def step(split, epoch, opt, data_loader, model, optimizer=None):
   for i, batch in enumerate(data_loader):
     data_time.update(time.time() - end)
     input, target, meta = batch['input'], batch['target'], batch['meta']
-    input_var = input.cuda(device=opt.device, non_blocking=True)  # TODO CUDA
-    target_var = target.cuda(device=opt.device, non_blocking=True)  # TODO CUDA
+    input_var = input.to(opt.device, non_blocking=True) #cuda(device=opt.device, non_blocking=True)  # TODO CUDA
+    target_var = target.to(opt.device, non_blocking=True) #.cuda(device=opt.device, non_blocking=True)  # TODO CUDA
 
     output = model(input_var)
 
@@ -53,16 +53,16 @@ def step(split, epoch, opt, data_loader, model, optimizer=None):
     else:
       input_ = input.cpu().numpy().copy()
       input_[0] = flip(input_[0]).copy()[np.newaxis, ...]
-      input_flip_var = torch.from_numpy(input_).cuda(  # TODO CUDA
-        device=opt.device, non_blocking=True)
+      input_flip_var = torch.from_numpy(input_).to(opt.device, non_blocking=True) #.cuda(  # TODO CUDA
+        #device=opt.device, non_blocking=True)
       output_flip = model(input_flip_var)
       output_flip = shuffle_lr(
         flip(output_flip[-1]['hm'].detach().cpu().numpy()[0]), shuffle_ref)
       output_flip = output_flip.reshape(
         1, opt.num_output, opt.output_h, opt.output_w)
       # output_ = (output[-1].detach().cpu().numpy() + output_flip) / 2
-      output_flip = torch.from_numpy(output_flip).cuda(  # TODO CUDA
-        device=opt.device, non_blocking=True)
+      output_flip = torch.from_numpy(output_flip).to(opt.device, non_blocking=True)#.cuda(  # TODO CUDA
+       # device=opt.device, non_blocking=True)
       output[-1]['hm'] = (output[-1]['hm'] + output_flip) / 2
       pred, conf = get_preds(output[-1]['hm'].detach().cpu().numpy(), True)
       preds.append(convert_eval_format(pred, conf, meta)[0])
