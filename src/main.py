@@ -54,7 +54,8 @@ def main(opt):
     model = model.to(opt.device)  # TODO CUDA fixed...?
     
   # TODO THIS IS ME ADDING AMP
-  #model, optimizer = amp.initialize(model, optimizer)
+  model, optimizer = amp.initialize(model, optimizer, opt_level='O2', 
+                                   loss_scale=64)
     
   cudnn.benchmark = True
 

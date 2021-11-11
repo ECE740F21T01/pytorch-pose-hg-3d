@@ -58,10 +58,10 @@ def step(split, epoch, opt, data_loader, model, optimizer=None):
 
     if split == 'train':
       optimizer.zero_grad()
-      loss.backward()
-      #with amp.scale_loss(loss, optimizer) as scaled_loss:
-      #  scaled_loss.backward()
-      torch.nn.utils.clip_grad_norm_(model.parameters(), 5.0)
+      #loss.backward()
+      with amp.scale_loss(loss, optimizer) as scaled_loss:
+        scaled_loss.backward()
+      #torch.nn.utils.clip_grad_norm_(model.parameters(), 5.0)
       optimizer.step()
     else:
       input_ = batch['input'].cpu().numpy().copy()

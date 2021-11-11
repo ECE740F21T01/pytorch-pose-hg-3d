@@ -10,7 +10,11 @@ def create_model(opt):
     print("=> using msra resnet '{}'".format(opt.arch))
     num_layers = int(opt.arch[opt.arch.find('_') + 1:])
     model = get_pose_net(num_layers, opt.heads)
-    optimizer = torch.optim.SGD(model.parameters(), opt.lr)  # TODO had to change from Adam...?
+    optimizer = torch.optim.SGD(model.parameters(), opt.lr,
+                                momentum=0.9,
+                                weight_decay=1e-4)  # TODO had to change from Adam...?
+    #optimizer = torch.optim.Adadelta(model.parameters(), opt.lr,
+    #                            weight_decay=1e-4)  # TODO had to change from Adam...?
   else:
     assert 0, "Model not supported!"
     
