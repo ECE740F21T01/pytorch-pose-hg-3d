@@ -56,6 +56,8 @@ class opts():
 
     self.parser.add_argument('--dataset3D', default = 'H36M', 
                              help = 'H36M | MPII3D | 3DPW | OcclusionPerson')
+    
+    self.parser.add_argument('--addr', default='10.136.181.115', type=str, help='master addr')
 
   def parse(self, args = ''):
     if args == '':
@@ -69,8 +71,8 @@ class opts():
     opt.epsilon = 1e-8
     opt.hm_gauss = 2
     opt.root_dir = os.path.join(os.path.dirname(__file__), '..', '..')
-    opt.data_dir = "D:\\Documents\\Research\\ECE740DS\\"
-    #opt.data_dir = os.path.join(opt.root_dir, 'data')
+    #opt.data_dir = "D:\\Documents\\Research\\ECE740DS\\"
+    opt.data_dir = os.path.join(opt.root_dir, 'data')
     opt.exp_dir = os.path.join(opt.root_dir, 'exp')
 
     opt.save_dir = os.path.join(opt.exp_dir, opt.exp_id)

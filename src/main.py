@@ -8,6 +8,7 @@ import os
 
 import torch
 import torch.utils.data
+import torch.backends.cudnn as cudnn
 from opts import opts
 from model import create_model, save_model
 from datasets.mpii import MPII
@@ -17,6 +18,7 @@ from logger import Logger
 from train import train, val
 from train_3d import train_3d, val_3d
 import scipy.io as sio
+from apex import amp
 
 dataset_factory = {
   'mpii': MPII,
@@ -30,6 +32,7 @@ task_factory = {
 }
 
 def main(opt):
+    
   if opt.disable_cudnn:
     torch.backends.cudnn.enabled = False
     print('Cudnn is disabled.')
@@ -49,6 +52,11 @@ def main(opt):
     model = torch.nn.DataParallel(model, device_ids=opt.gpus).to(opt.device)  # TODO CUDA fixed...?
   else:
     model = model.to(opt.device)  # TODO CUDA fixed...?
+    
+  # TODO THIS IS ME ADDING AMP
+  #model, optimizer = amp.initialize(model, optimizer)
+    
+  cudnn.benchmark = True
 
   val_loader = torch.utils.data.DataLoader(
       Dataset(opt, 'val'), 
@@ -104,4 +112,7 @@ def main(opt):
 if __name__ == '__main__':
   opt = opts().parse()
   print(opt)
+  print("Setting NPU!")
+  print(opt.gpus[0])
+  torch.npu.set_device(opt.gpus[0])
   main(opt)

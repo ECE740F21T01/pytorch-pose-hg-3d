@@ -10,7 +10,7 @@ def create_model(opt):
     print("=> using msra resnet '{}'".format(opt.arch))
     num_layers = int(opt.arch[opt.arch.find('_') + 1:])
     model = get_pose_net(num_layers, opt.heads)
-    optimizer = torch.optim.Adam(model.parameters(), opt.lr)
+    optimizer = torch.optim.SGD(model.parameters(), opt.lr)  # TODO had to change from Adam...?
   else:
     assert 0, "Model not supported!"
     
@@ -32,7 +32,7 @@ def create_model(opt):
         for k, v in state.items():
           if isinstance(v, torch.Tensor):
             #state[k] = v.cuda(opt.device, non_blocking=True)  # TODO CUDA fixed...?
-            state[k] = v.to(opt.device, non_blocking=True)
+            state[k] = v.to(opt.device, non_blocking=False)
 
   return model, optimizer, start_epoch
   

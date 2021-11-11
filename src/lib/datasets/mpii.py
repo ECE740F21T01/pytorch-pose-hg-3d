@@ -25,7 +25,7 @@ class MPII(data.Dataset):
     annot = {}
     tags = ['image','joints','center','scale']
     self.data_path = os.path.join(opt.data_dir, 'mpii')
-    f = json.load(open(Path('{}\\annot\\{}.json'.format(self.data_path, split)), 'r'))
+    f = json.load(open(Path('{}/annot/{}.json'.format(self.data_path, split)), 'r'))
     self.num_samples = len(f)
     for tag in tags:
       annot[tag] = []

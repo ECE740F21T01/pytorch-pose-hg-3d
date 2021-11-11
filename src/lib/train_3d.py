@@ -7,6 +7,7 @@ from progress.bar import Bar
 from utils.debugger import Debugger
 from models.losses import RegLoss, FusionLoss
 import time
+from apex import amp
 
 def step(split, epoch, opt, data_loader, model, optimizer=None):
   if split == 'train':
@@ -39,8 +40,8 @@ def step(split, epoch, opt, data_loader, model, optimizer=None):
     data_time.update(time.time() - end)
     for k in batch:
       if k != 'meta':
-        batch[k] = batch[k].to(opt.device, non_blocking=True) #.cuda(device=opt.device, non_blocking=True)  # TODO CUDA
-    gt_2d = batch['meta']['pts_crop'].to(opt.device, non_blocking=True).float() / opt.output_h #.cuda(  # TODO CUDA
+        batch[k] = batch[k].to(opt.device, non_blocking=False) #.cuda(device=opt.device, non_blocking=True)  # TODO CUDA
+    gt_2d = batch['meta']['pts_crop'].to(opt.device, non_blocking=False).float() / opt.output_h #.cuda(  # TODO CUDA
      # device=opt.device, non_blocking=True).float() / opt.output_h
     output = model(batch['input'])
 
@@ -58,11 +59,14 @@ def step(split, epoch, opt, data_loader, model, optimizer=None):
     if split == 'train':
       optimizer.zero_grad()
       loss.backward()
+      #with amp.scale_loss(loss, optimizer) as scaled_loss:
+      #  scaled_loss.backward()
+      torch.nn.clip_grad_norm_(model.parameters(), 5.0)
       optimizer.step()
     else:
       input_ = batch['input'].cpu().numpy().copy()
       input_[0] = flip(input_[0]).copy()[np.newaxis, ...]
-      input_flip_var = torch.from_numpy(input_).to(device=opt.device, non_blocking=True) #.cuda(  # TODO CUDA
+      input_flip_var = torch.from_numpy(input_).to(device=opt.device, non_blocking=False) #.cuda(  # TODO CUDA
       #  device=opt.device, non_blocking=True)
       output_flip_ = model(input_flip_var)
       output_flip = shuffle_lr(
@@ -74,9 +78,9 @@ def step(split, epoch, opt, data_loader, model, optimizer=None):
       output_depth_flip = output_depth_flip.reshape(
         1, opt.num_output, opt.output_h, opt.output_w)
       output_flip = torch.from_numpy(output_flip).to(  # TODO CUDA
-        device=opt.device, non_blocking=True)
+        device=opt.device, non_blocking=False)
       output_depth_flip = torch.from_numpy(output_depth_flip).to(  # TODO CUDA
-        device=opt.device, non_blocking=True)
+        device=opt.device, non_blocking=False)
       output[-1]['hm'] = (output[-1]['hm'] + output_flip) / 2
       output[-1]['depth'] = (output[-1]['depth'] + output_depth_flip) / 2
       # pred = get_preds(output[-1]['hm'].detach().cpu().numpy())
