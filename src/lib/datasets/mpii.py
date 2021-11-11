@@ -20,8 +20,8 @@ class MPII(data.Dataset):
     self.edges = [[0, 1], [1, 2], [2, 6], [6, 3], [3, 4], [4, 5], 
                   [10, 11], [11, 12], [12, 8], [8, 13], [13, 14], [14, 15], 
                   [6, 8], [8, 9]]
-    self.mean = np.array([0.485, 0.456, 0.406], np.float32).reshape(1, 1, 3)
-    self.std = np.array([0.229, 0.224, 0.225], np.float32).reshape(1, 1, 3)
+    self.mean = np.array([0.485, 0.456, 0.406], np.float16).reshape(1, 1, 3)
+    self.std = np.array([0.229, 0.224, 0.225], np.float16).reshape(1, 1, 3)
     annot = {}
     tags = ['image','joints','center','scale']
     self.data_path = os.path.join(opt.data_dir, 'mpii')
@@ -59,8 +59,8 @@ class MPII(data.Dataset):
   
   def _get_part_info(self, index):
     pts_all = np.array(self.annot['pts_all'][index])
-    pts = self.annot['joints'][index].copy().astype(np.float32)
-    c = self.annot['center'][index].copy().astype(np.float32)
+    pts = self.annot['joints'][index].copy().astype(np.float16)
+    c = self.annot['center'][index].copy().astype(np.float16)
     s = self.annot['scale'][index]
     c[1] = c[1] + 15 * s
     c -= 1
@@ -95,13 +95,13 @@ class MPII(data.Dataset):
       c, s, r, [self.opt.input_h, self.opt.input_w])
     inp = cv2.warpAffine(img, trans_input, (self.opt.input_h, self.opt.input_w),
                          flags=cv2.INTER_LINEAR)
-    inp = (inp.astype(np.float32) / 256. - self.mean) / self.std
+    inp = (inp.astype(np.float16) / 256. - self.mean) / self.std
     inp = inp.transpose(2, 0, 1)
 
     trans_output = get_affine_transform(
       c, s, r, [self.opt.output_h, self.opt.output_w])
     out = np.zeros((self.num_joints, self.opt.output_h, self.opt.output_w), 
-                    dtype=np.float32)
+                    dtype=np.float16)
     pts_crop = np.zeros((self.num_joints, 2), dtype=np.int32)
     for i in range(self.num_joints):
       if pts[i, 0] > 0 or pts[i, 1] > 0:

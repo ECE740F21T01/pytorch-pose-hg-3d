@@ -87,7 +87,7 @@ def rotation_matrix_to_angle_axis(rotation_matrix):
     """
     if rotation_matrix.shape[1:] == (3,3):
         rot_mat = rotation_matrix.reshape(-1, 3, 3)
-        hom = torch.tensor([0, 0, 1], dtype=torch.float32,
+        hom = torch.tensor([0, 0, 1], dtype=torch.float16,
                            device=rotation_matrix.device).reshape(1, 3, 1).expand(rot_mat.shape[0], -1, -1)
         rotation_matrix = torch.cat([rot_mat, hom], dim=-1)
 
@@ -295,7 +295,7 @@ def estimate_translation(S, joints_2d, focal_length=5000., img_size=224.):
     joints_2d = joints_2d[:, 25:, :].cpu().numpy()
     joints_conf = joints_2d[:, :, -1]
     joints_2d = joints_2d[:, :, :-1]
-    trans = np.zeros((S.shape[0], 3), dtype=np.float32)
+    trans = np.zeros((S.shape[0], 3), dtype=np.float16)
     # Find the translation for each example in the batch
     for i in range(S.shape[0]):
         S_i = S[i]

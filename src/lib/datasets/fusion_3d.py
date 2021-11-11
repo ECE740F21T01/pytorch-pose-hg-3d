@@ -52,10 +52,10 @@ class Fusion3D(data.Dataset):
       return self.dataset3D[index]
     else:
       ret = self.dataset2D[index - self.nImages3D]
-      reg_target = np.zeros((self.num_joints, 1), dtype=np.float32)
+      reg_target = np.zeros((self.num_joints, 1), dtype=np.float16)
       reg_ind = np.zeros((self.num_joints), dtype=np.int64)
       reg_mask = np.zeros((self.num_joints), dtype=np.uint8)
-      gt_3d = np.zeros((self.num_eval_joints, 3), dtype=np.float32)
+      gt_3d = np.zeros((self.num_eval_joints, 3), dtype=np.float16)
       pts_crop = ret['meta']['pts_crop']
       for i in range(self.num_joints):
         pt = pts_crop[i]

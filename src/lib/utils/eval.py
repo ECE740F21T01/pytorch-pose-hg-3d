@@ -58,7 +58,7 @@ def accuracy(output, target, acc_idxs):
 def get_preds_3d(heatmap, depthmap):
   output_res = max(heatmap.shape[2], heatmap.shape[3])
   preds = get_preds(heatmap).astype(np.int32)
-  preds_3d = np.zeros((preds.shape[0], preds.shape[1], 3), dtype=np.float32)
+  preds_3d = np.zeros((preds.shape[0], preds.shape[1], 3), dtype=np.float16)
   for i in range(preds.shape[0]):
     for j in range(preds.shape[1]):
       idx = min(j, depthmap.shape[1] - 1)

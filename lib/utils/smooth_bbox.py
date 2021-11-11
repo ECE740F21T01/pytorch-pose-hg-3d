@@ -76,7 +76,7 @@ def get_all_bbox_params(kps, vis_thresh=2):
     # keeps track of how many indices in a row with no prediction
     num_to_interpolate = 0
     start_index = -1
-    bbox_params = np.empty(shape=(0, 3), dtype=np.float32)
+    bbox_params = np.empty(shape=(0, 3), dtype=np.float16)
 
     for i, kp in enumerate(kps):
         bbox_param = kp_to_bbox_param(kp, vis_thresh=vis_thresh)

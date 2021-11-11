@@ -43,7 +43,7 @@ def convert_kps_coco18_mpii(joints2d):
     src_names = eval(f'get_coco18_joint_names')()
     dst_names = eval(f'get_mpii_joint_names')()
 
-    out_joints2d = np.zeros((joints2d.shape[0], len(dst_names), 3), dtype=np.float32)
+    out_joints2d = np.zeros((joints2d.shape[0], len(dst_names), 3), dtype=np.float16)
 
     for idx, jn in enumerate(dst_names):
         # need to infer "hip", "thorax", "neck", "headtop" from other existing joints

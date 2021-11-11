@@ -21,8 +21,8 @@ class COCO(data.Dataset):
     self.shuffle_ref = [[1, 2], [3, 4], [5, 6], [7, 8], [9, 10], 
                         [11, 12], [13, 14], [15, 16]]
     self.acc_idxs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
-    self.mean = np.array([0.485, 0.456, 0.406], np.float32).reshape(1, 1, 3)
-    self.std = np.array([0.229, 0.224, 0.225], np.float32).reshape(1, 1, 3)
+    self.mean = np.array([0.485, 0.456, 0.406], np.float16).reshape(1, 1, 3)
+    self.std = np.array([0.229, 0.224, 0.225], np.float16).reshape(1, 1, 3)
     self.aspect_ratio = 1.0 * opt.input_w / opt.input_h
 
     self.split = split
@@ -62,7 +62,7 @@ class COCO(data.Dataset):
     return self._xywh2cs(x, y, w, h)
 
   def _xywh2cs(self, x, y, w, h):
-    center = np.zeros((2), dtype=np.float32)
+    center = np.zeros((2), dtype=np.float16)
     center[0] = x + w * 0.5
     center[1] = y + h * 0.5
 
@@ -70,7 +70,7 @@ class COCO(data.Dataset):
         h = w * 1.0 / self.aspect_ratio
     elif w < self.aspect_ratio * h:
         w = h * self.aspect_ratio
-    scale = np.array([w, h], dtype=np.float32)
+    scale = np.array([w, h], dtype=np.float16)
     if center[0] != -1:
       scale = scale * 1.25
 
@@ -87,11 +87,11 @@ class COCO(data.Dataset):
     pts_all = []
     for k in range(len(ann_all)):
       pts_k = np.array(ann_all[k]['keypoints'])
-      pts_k = pts_k.reshape(self.num_joints, 3).astype(np.float32)
+      pts_k = pts_k.reshape(self.num_joints, 3).astype(np.float16)
       pts_all.append(pts_k.copy())
 
     pts = np.array(ann['keypoints']).reshape(
-      self.num_joints, 3).astype(np.float32)
+      self.num_joints, 3).astype(np.float16)
 
     c, s = self._box2cs(clean_bbox)
     r = 0 
@@ -107,13 +107,13 @@ class COCO(data.Dataset):
       c, s, r, [self.opt.input_w, self.opt.input_h])
     inp = cv2.warpAffine(img, trans_input, (self.opt.input_w, self.opt.input_h),
                          flags=cv2.INTER_LINEAR)
-    inp = (inp.astype(np.float32) / 256. - self.mean) / self.std
+    inp = (inp.astype(np.float16) / 256. - self.mean) / self.std
     inp = inp.transpose(2, 0, 1)
 
     trans_output = get_affine_transform(
       c, s, r, [self.opt.output_w, self.opt.output_h])
     out = np.zeros((self.num_joints, self.opt.output_h, self.opt.output_w), 
-                    dtype=np.float32)
+                    dtype=np.float16)
     for i in range(self.num_joints):
       if pts[i, 2] > 0:
         pt = affine_transform(pts[i], trans_output)
@@ -121,7 +121,7 @@ class COCO(data.Dataset):
 
     '''
     out_all = np.zeros((self.num_joints, self.opt.output_w, self.opt.output_h), 
-                       dtype=np.float32)
+                       dtype=np.float16)
     for k in range(len(pts_all)):
       pts = pts_all[k]
       for i in range(self.num_joints):

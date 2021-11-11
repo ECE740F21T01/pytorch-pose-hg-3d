@@ -17,8 +17,8 @@ from utils.image import get_affine_transform, transform_preds
 from utils.eval import get_preds, get_preds_3d
 
 image_ext = ['jpg', 'jpeg', 'png']
-mean = np.array([0.485, 0.456, 0.406], np.float32).reshape(1, 1, 3)
-std = np.array([0.229, 0.224, 0.225], np.float32).reshape(1, 1, 3)
+mean = np.array([0.485, 0.456, 0.406], np.float16).reshape(1, 1, 3)
+std = np.array([0.229, 0.224, 0.225], np.float16).reshape(1, 1, 3)
 
 def is_image(file_name):
   ext = file_name[file_name.rfind('.') + 1:].lower()
@@ -27,13 +27,13 @@ def is_image(file_name):
 
 def demo_image(image, model, opt):
   s = max(image.shape[0], image.shape[1]) * 1.0
-  c = np.array([image.shape[1] / 2., image.shape[0] / 2.], dtype=np.float32)
+  c = np.array([image.shape[1] / 2., image.shape[0] / 2.], dtype=np.float16)
   trans_input = get_affine_transform(
       c, s, 0, [opt.input_w, opt.input_h])
   inp = cv2.warpAffine(image, trans_input, (opt.input_w, opt.input_h),
                          flags=cv2.INTER_LINEAR)
   inp = (inp / 255. - mean) / std
-  inp = inp.transpose(2, 0, 1)[np.newaxis, ...].astype(np.float32)
+  inp = inp.transpose(2, 0, 1)[np.newaxis, ...].astype(np.float16)
   inp = torch.from_numpy(inp).to(opt.device)
   out = model(inp)[-1]
   pred = get_preds(out['hm'].detach().cpu().numpy())[0]
