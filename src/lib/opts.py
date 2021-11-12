@@ -100,7 +100,12 @@ class opts():
     if opt.rotate == -1:
       opt.rotate = 40 if opt.dataset == 'coco' else 30
 
-    opt.num_output = 17 if opt.dataset == 'coco' else 16
+    if opt.dataset == 'coco':
+      opt.num_output = 17
+    elif opt.dataset == 'flic':
+      opt.num_output = 11
+    else:
+      opt.num_output = 16
     opt.num_output_depth = opt.num_output if opt.task == 'human3d' else 0
     opt.heads = {'hm': opt.num_output}
     if opt.num_output_depth > 0:

@@ -13,10 +13,11 @@ from utils.image import transform_preds
 class FLIC(data.Dataset):
     def __init__(self, opt, split):
         print('==> initializing 2D {} data.'.format(split))
-        self.num_joints = 16
-        self.acc_idxs = [0, 1, 2, 3, 4, 5, 10, 11, 14, 15]
+        self.num_joints = 11
+        self.acc_idxs = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        # modified shuffle_ref because num_joints changed
         self.shuffle_ref = [[0, 5], [1, 4], [2, 3], 
-                            [10, 15], [11, 14], [12, 13]]
+                            [6, 10], [7, 8]]
         self.edges = [[0, 1], [1, 2], [2, 6], [6, 3], [3, 4], [4, 5], 
                     [10, 11], [11, 12], [12, 8], [8, 13], [13, 14], [14, 15], 
                     [6, 8], [8, 9]]
@@ -35,7 +36,8 @@ class FLIC(data.Dataset):
             'center': 6,
             'scale': 4
         }
-        self.flic_to_mpii = [12, 11, 10, 7, 8, 9, 19, 21, 18, 17, 6, 5, 4, 1, 2, 3] # obtained from mpii/gt_valid.mat
+        #self.flic_to_mpii = [12, 11, 10, 7, 8, 9, 19, 21, 18, 17, 6, 5, 4, 1, 2, 3] # obtained from mpii/gt_valid.mat
+        self.flic_to_mpii = [0, 1, 2, 3, 4, 5, 6, 9, 12, 13, 16]
         self.data_path = os.path.join(opt.data_dir, 'flic')
         mat = scipy.io.loadmat('{}/annot/examples.mat'.format(self.data_path))
         examples = mat['examples'][0]
