@@ -4,6 +4,7 @@ import torch
 
 from .mpii import MPII
 from .lsp_extended import LSPExtended
+from .flic_full import FLICFull
 
 from .h36m import H36M
 from .mpii3d import MPII3D
@@ -33,8 +34,7 @@ class Fusion3D(data.Dataset):
       elif opt.dataset2D == "lsp_extended":
           self.dataset2D = LSPExtended(opt, split)
       elif opt.dataset2D == "flic_full":
-        self.dataset2D = None
-          # self.dataset2D = MPII(opt, split)
+          self.dataset2D = FLICFull(opt, split)
       else:
           raise ValueError("Unrecognized dataset2D:", opt.dataset2D)
       self.nImages2D = len(self.dataset2D)

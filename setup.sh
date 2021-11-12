@@ -40,7 +40,7 @@ ln -s /data/keith/datasets/occlusion_person /data/liyao/projects/ECE740/pytorch-
 ln -s  /data/keith/datasets/lsp_extended/ /data/liyao/projects/ECE740/pytorch-pose-hg-3d/data/lsp_extended
 ln -s  /data/keith/datasets/lsp/ /data/liyao/projects/ECE740/pytorch-pose-hg-3d/data/lsp
 # FLIC-Full
-ln -s 
+ln -s /data/keith/datasets/FLIC-full/ /data/liyao/projects/ECE740/pytorch-pose-hg-3d/data/flic_full
 
 # Install additional envs from VIBE:
 # pip install numpy==1.17.5 torch==1.4.0 torchvision==0.5.0

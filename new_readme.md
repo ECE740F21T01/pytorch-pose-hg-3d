@@ -5,6 +5,8 @@ Please refer to `setup.sh`
 
 2D Pretraining:
 - MPII
+- LSP-Extended
+- FLIC-Full
 
 3D Finetuning:
 - Human3.6M (a.k.a. H36M)
@@ -12,10 +14,20 @@ Please refer to `setup.sh`
 - 3DPW
 - Occlusion-Person (a.k.a. OcclusionPerson)
 
-To choose which 3D dataset for evaluation and training, add this argument
+To do pretraining on 2D dataset only, use this argument:
+```Python
+# opt.dataset chooses to use which 2D dataset, or can choose Fusion3D
+self.parser.add_argument('--dataset', default = 'mpii',
+                            help = 'mpii | lsp_extended | flic_full | fusion_3d')
 ```
-self.parser.add_argument('--dataset3D', default = 'H36M', 
-                             help = 'H36M | MPII3D | 3DPW | OcclusionPerson')
+
+When choosing opt.dataset as "fusion_3d", need to specify which 2D Dataset and which 3D dataset to use for training and evaluation (for evalaution only dataset3D is used), add these arguments
+```Python
+# if opt.dataset is "fusion_3d", then need to choose which dataset2D and which dataset3D
+self.parser.add_argument('--dataset2D', default = 'mpii',
+                            help = 'mpii | lsp_extended | flic_full')
+self.parser.add_argument('--dataset3D', default = 'H36M',
+                            help = 'H36M | MPII3D | 3DPW | OcclusionPerson')
 ```
 
 ## References:
