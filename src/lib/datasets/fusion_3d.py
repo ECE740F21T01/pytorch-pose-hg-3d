@@ -1,7 +1,11 @@
 import torch.utils.data as data
 import numpy as np
 import torch
+
 from .mpii import MPII
+from .lsp_extended import LSPExtended
+from .flic_full import FLICFull
+
 from .h36m import H36M
 from .mpii3d import MPII3D
 from .threedpw import ThreeDPW
@@ -22,10 +26,17 @@ class Fusion3D(data.Dataset):
     elif opt.dataset3D == "H36M":
         self.dataset3D = H36M(opt, split)
     else:
-        self.dataset3D = H36M(opt, split)
+        raise ValueError("Unrecognized dataset3D:", opt.dataset3D)
     
     if self.split == 'train':
-      self.dataset2D = MPII(opt, split)
+      if opt.dataset2D == "mpii":
+          self.dataset2D = MPII(opt, split)
+      elif opt.dataset2D == "lsp_extended":
+          self.dataset2D = LSPExtended(opt, split)
+      elif opt.dataset2D == "flic_full":
+          self.dataset2D = FLICFull(opt, split)
+      else:
+          raise ValueError("Unrecognized dataset2D:", opt.dataset2D)
       self.nImages2D = len(self.dataset2D)
       self.nImages3D = min(len(self.dataset3D), 
                            int(self.nImages2D * self.ratio3D))

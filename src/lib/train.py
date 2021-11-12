@@ -35,6 +35,13 @@ def step(split, epoch, opt, data_loader, model, optimizer=None):
     input, target, meta = batch['input'], batch['target'], batch['meta']
     input_var = input.cuda(device=opt.device, non_blocking=True)  # TODO CUDA
     target_var = target.cuda(device=opt.device, non_blocking=True)  # TODO CUDA
+    if target_var.min() < -0.01:
+        print("Min below 0")
+        print(target_var.min())
+    if target_var.max() > 1.01:
+        print("Max above 1")
+        print(target_var.max())
+
 
     output = model(input_var)
 
@@ -49,6 +56,7 @@ def step(split, epoch, opt, data_loader, model, optimizer=None):
     if split == 'train':
       optimizer.zero_grad()
       loss.backward()
+      #torch.nn.utils.clip_grad_norm_(model.parameters(), 5.0)
       optimizer.step()
     else:
       input_ = input.cpu().numpy().copy()
@@ -67,9 +75,6 @@ def step(split, epoch, opt, data_loader, model, optimizer=None):
       pred, conf = get_preds(output[-1]['hm'].detach().cpu().numpy(), True)
       preds.append(convert_eval_format(pred, conf, meta)[0])
 
-#    print(loss.shape)
-#    print(input.shape)
-#    Loss.update(loss.detach()[0], input.size(0))
     Loss.update(loss.item(), input.size(0))
     Acc.update(accuracy(output[-1]['hm'].detach().cpu().numpy(), 
                         target_var.detach().cpu().numpy(), acc_idxs))

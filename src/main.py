@@ -12,6 +12,8 @@ from opts import opts
 from model import create_model, save_model
 from datasets.mpii import MPII
 from datasets.coco import COCO
+from datasets.lsp_extended import LSPExtended
+from datasets.flic_full import FLICFull
 from datasets.fusion_3d import Fusion3D
 from logger import Logger
 from train import train, val
@@ -20,6 +22,8 @@ import scipy.io as sio
 
 dataset_factory = {
   'mpii': MPII,
+  'lsp_extended': LSPExtended,
+  'flic_full': FLICFull,
   'coco': COCO,
   'fusion_3d': Fusion3D
 }
