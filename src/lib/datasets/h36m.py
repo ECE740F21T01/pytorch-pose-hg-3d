@@ -30,8 +30,8 @@ class H36M(data.Dataset):
                      [0, 7], [7, 8], [8, 10],\
                      [16, 15], [15, 14], [14, 8], [8, 11], [11, 12], [12, 13]]
     self.mean_bone_length = 4000
-    self.mean = np.array([0.485, 0.456, 0.406], np.float16).reshape(1, 1, 3)
-    self.std = np.array([0.229, 0.224, 0.225], np.float16).reshape(1, 1, 3)
+    self.mean = np.array([0.485, 0.456, 0.406], np.float32).reshape(1, 1, 3)
+    self.std = np.array([0.229, 0.224, 0.225], np.float32).reshape(1, 1, 3)
     self.aspect_ratio = 1.0 * opt.input_w / opt.input_h
     self.split = split
     self.opt = opt
@@ -59,10 +59,10 @@ class H36M(data.Dataset):
   
   def _get_part_info(self, index):
     ann = self.annot[self.idxs[index]]
-    gt_3d = np.array(ann['joints_3d_relative'], np.float16)[:17]
-    pts = np.array(ann['joints_3d'], np.float16)[self.h36m_to_mpii]
-    # pts[:, :2] = np.array(ann['det_2d'], dtype=np.float16)[:, :2]
-    c = np.array([ann['center_x'], ann['center_y']], dtype=np.float16)
+    gt_3d = np.array(ann['joints_3d_relative'], np.float32)[:17]
+    pts = np.array(ann['joints_3d'], np.float32)[self.h36m_to_mpii]
+    # pts[:, :2] = np.array(ann['det_2d'], dtype=np.float32)[:, :2]
+    c = np.array([ann['center_x'], ann['center_y']], dtype=np.float32)
     s = max(ann['width'], ann['height'])
     return gt_3d, pts, c, s
       
@@ -101,14 +101,14 @@ class H36M(data.Dataset):
       c, s, r, [self.opt.input_w, self.opt.input_h])
     inp = cv2.warpAffine(img, trans_input, (self.opt.input_w, self.opt.input_h),
                          flags=cv2.INTER_LINEAR)
-    inp = (inp.astype(np.float16) / 256. - self.mean) / self.std
+    inp = (inp.astype(np.float32) / 256. - self.mean) / self.std
     inp = inp.transpose(2, 0, 1)
 
     trans_output = get_affine_transform(
       c, s, r, [self.opt.output_w, self.opt.output_h])
     out = np.zeros((self.num_joints, self.opt.output_h, self.opt.output_w), 
-                    dtype=np.float16)
-    reg_target = np.zeros((self.num_joints, 1), dtype=np.float16)
+                    dtype=np.float32)
+    reg_target = np.zeros((self.num_joints, 1), dtype=np.float32)
     reg_ind = np.zeros((self.num_joints), dtype=np.int64)
     reg_mask = np.zeros((self.num_joints), dtype=np.uint8)
     pts_crop = np.zeros((self.num_joints, 2), dtype=np.int32)

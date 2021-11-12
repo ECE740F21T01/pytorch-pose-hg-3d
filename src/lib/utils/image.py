@@ -34,7 +34,7 @@ def get_affine_transform(center,
                          scale,
                          rot,
                          output_size,
-                         shift=np.array([0, 0], dtype=np.float16),
+                         shift=np.array([0, 0], dtype=np.float32),
                          inv=0):
     if not isinstance(scale, np.ndarray) and not isinstance(scale, list):
         scale = np.array([scale, scale])
@@ -46,10 +46,10 @@ def get_affine_transform(center,
 
     rot_rad = np.pi * rot / 180
     src_dir = get_dir([0, src_w * -0.5], rot_rad)
-    dst_dir = np.array([0, dst_w * -0.5], np.float16)
+    dst_dir = np.array([0, dst_w * -0.5], np.float32)
 
-    src = np.zeros((3, 2), dtype=np.float16)
-    dst = np.zeros((3, 2), dtype=np.float16)
+    src = np.zeros((3, 2), dtype=np.float32)
+    dst = np.zeros((3, 2), dtype=np.float32)
     src[0, :] = center + scale_tmp * shift
     src[1, :] = center + src_dir + scale_tmp * shift
     dst[0, :] = [dst_w * 0.5, dst_h * 0.5]
@@ -59,9 +59,9 @@ def get_affine_transform(center,
     dst[2:, :] = get_3rd_point(dst[0, :], dst[1, :])
 
     if inv:
-        trans = cv2.getAffineTransform(np.float16(dst), np.float16(src))
+        trans = cv2.getAffineTransform(np.float32(dst), np.float32(src))
     else:
-        trans = cv2.getAffineTransform(np.float16(src), np.float16(dst))
+        trans = cv2.getAffineTransform(np.float32(src), np.float32(dst))
 
     return trans
 
@@ -74,7 +74,7 @@ def affine_transform(pt, t):
 
 def get_3rd_point(a, b):
     direct = a - b
-    return b + np.array([-direct[1], direct[0]], dtype=np.float16)
+    return b + np.array([-direct[1], direct[0]], dtype=np.float32)
 
 
 def get_dir(src_point, rot_rad):
@@ -115,7 +115,7 @@ def draw_gaussian(heatmap, center, sigma):
   if ul[0] >= h or ul[1] >= w or br[0] < 0 or br[1] < 0:
     return heatmap
   size = 2 * tmp_size + 1
-  x = np.arange(0, size, 1, np.float16)
+  x = np.arange(0, size, 1, np.float32)
   y = x[:, np.newaxis]
   x0 = y0 = size // 2
   g = np.exp(- ((x - x0) ** 2 + (y - y0) ** 2) / (2 * sigma ** 2))

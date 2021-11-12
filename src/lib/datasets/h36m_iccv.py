@@ -29,8 +29,8 @@ class H36M(data.Dataset):
                      [0, 7], [7, 8], [8, 9], [9, 10],\
                      [16, 15], [15, 14], [14, 8], [8, 11], [11, 12], [12, 13]]
     self.mean_bone_length = 4072.3544 # train: 4072.3544, val: 4252.4707
-    self.mean = np.array([0.485, 0.456, 0.406], np.float16).reshape(1, 1, 3)
-    self.std = np.array([0.229, 0.224, 0.225], np.float16).reshape(1, 1, 3)
+    self.mean = np.array([0.485, 0.456, 0.406], np.float32).reshape(1, 1, 3)
+    self.std = np.array([0.229, 0.224, 0.225], np.float32).reshape(1, 1, 3)
     self.aspect_ratio = 1.0 * opt.input_w / opt.input_h
     self.split = split
     self.opt = opt
@@ -111,7 +111,7 @@ class H36M(data.Dataset):
       s3d += ((pts_3d[e[0], :2] - pts_3d[e[1], :2]) ** 2).sum() ** 0.5
     scale = s2d / s3d
     
-    uvd = np.zeros((self.num_joints, 3), dtype=np.float16)
+    uvd = np.zeros((self.num_joints, 3), dtype=np.float32)
     for j in range(self.num_joints):
       uvd[j, 0] = pts_2d[j, 0]
       uvd[j, 1] = pts_2d[j, 1]
@@ -129,11 +129,11 @@ class H36M(data.Dataset):
   
   def _get_part_info(self, index):
     ann = self.annot[self.idxs[index]]
-    gt_3d = np.array(ann['gt_3d'], dtype=np.float16)
+    gt_3d = np.array(ann['gt_3d'], dtype=np.float32)
     gt_3d = gt_3d - gt_3d[:1]
     gt_3d = gt_3d[self.h36m_to_mpii]
-    pts = np.array(ann['uvd'], dtype=np.float16)
-    c = np.array([112, 112], dtype=np.float16)
+    pts = np.array(ann['uvd'], dtype=np.float32)
+    c = np.array([112, 112], dtype=np.float32)
     s = 224.
     return gt_3d, pts, c, s
       
@@ -152,14 +152,14 @@ class H36M(data.Dataset):
       c, s, r, [self.opt.input_h, self.opt.input_w])
     inp = cv2.warpAffine(img, trans_input, (self.opt.input_h, self.opt.input_w),
                          flags=cv2.INTER_LINEAR)
-    inp = (inp.astype(np.float16) / 256. - self.mean) / self.std
+    inp = (inp.astype(np.float32) / 256. - self.mean) / self.std
     inp = inp.transpose(2, 0, 1)
 
     trans_output = get_affine_transform(
       c, s, r, [self.opt.output_h, self.opt.output_w])
     out = np.zeros((self.num_joints, self.opt.output_h, self.opt.output_w), 
-                    dtype=np.float16)
-    reg_target = np.zeros((self.num_joints, 1), dtype=np.float16)
+                    dtype=np.float32)
+    reg_target = np.zeros((self.num_joints, 1), dtype=np.float32)
     reg_ind = np.zeros((self.num_joints), dtype=np.int64)
     reg_mask = np.zeros((self.num_joints), dtype=np.uint8)
     pts_crop = np.zeros((self.num_joints, 2), dtype=np.int32)

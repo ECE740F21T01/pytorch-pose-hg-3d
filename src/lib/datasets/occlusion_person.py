@@ -64,7 +64,7 @@ def convert_kps_unrealcv_mpii(in_joints):
     src_names = eval(f'get_unrealcv_joint_names')()
     dst_names = eval(f'get_mpii_joint_names')()
     
-    out_joints = np.zeros((len(dst_names), in_joints.shape[1]), dtype=np.float16)
+    out_joints = np.zeros((len(dst_names), in_joints.shape[1]), dtype=np.float32)
 
     for idx, jn in enumerate(dst_names):
         # need to infer "thorax", "headtop" from other existing joints
@@ -98,8 +98,8 @@ class OcclusionPerson(data.Dataset):
                      [16, 15], [15, 14], [14, 8], [8, 11], [11, 12], [12, 13]]
     self.mean_bone_length = 4000
     # normalize to mean and std of Imagenet
-    self.mean = np.array([0.485, 0.456, 0.406], np.float16).reshape(1, 1, 3)
-    self.std = np.array([0.229, 0.224, 0.225], np.float16).reshape(1, 1, 3)
+    self.mean = np.array([0.485, 0.456, 0.406], np.float32).reshape(1, 1, 3)
+    self.std = np.array([0.229, 0.224, 0.225], np.float32).reshape(1, 1, 3)
     self.aspect_ratio = 1.0 * opt.input_w / opt.input_h
     self.split = split
     self.opt = opt
@@ -133,20 +133,20 @@ class OcclusionPerson(data.Dataset):
     ann = self.annot[self.idxs[index]]
     
     # gt_3d: [X-root, Y-root, Z-root] in camera coordinate
-    gt_3d = np.array(ann['joints_3d'], np.float16) # in occulusion-person (unrealcv) format, in camera coordinate system
+    gt_3d = np.array(ann['joints_3d'], np.float32) # in occulusion-person (unrealcv) format, in camera coordinate system
     gt_3d = convert_kps_unrealcv_mpii(gt_3d) # convert to mpii format (16 joints)
     gt_3d = gt_3d - gt_3d[6] # relative joint coordinates, relative to pelvis, by subtracting pelvis/(hip)/(root)
     pts_3d = gt_3d.copy()
     gt_3d = gt_3d[self.mpii_to_h36m][:17] # relative joint coordinates, relative to pelvis, converted to H36M format (17 joints)
     
     # pts: [org_img_x, org_img_y, depth - root_depth] in mpii format (16 joints)
-    pts = np.zeros(pts_3d.shape, dtype=np.float16)
-    pts_2d = np.array(ann['joints_2d'], np.float16)
+    pts = np.zeros(pts_3d.shape, dtype=np.float32)
+    pts_2d = np.array(ann['joints_2d'], np.float32)
     pts_2d = convert_kps_unrealcv_mpii(pts_2d)
     pts[:, 0:2] = pts_2d[:, 0:2] # org_img_x, org_img_y
     pts[:, 2] = pts_3d[:, 2] # depth - root_depth
     
-    c = np.array([ann['center'][0], ann['center'][1]], dtype=np.float16) # c_x, c_y
+    c = np.array([ann['center'][0], ann['center'][1]], dtype=np.float32) # c_x, c_y
     s = max(ann['scale'][0]*200, ann['scale'][1]*200) # w, h for bbox (for occulusion-person need to multiply scale with 200)
     
     return gt_3d, pts, c, s
@@ -186,14 +186,14 @@ class OcclusionPerson(data.Dataset):
       c, s, r, [self.opt.input_w, self.opt.input_h])
     inp = cv2.warpAffine(img, trans_input, (self.opt.input_w, self.opt.input_h),
                          flags=cv2.INTER_LINEAR)
-    inp = (inp.astype(np.float16) / 256. - self.mean) / self.std
+    inp = (inp.astype(np.float32) / 256. - self.mean) / self.std
     inp = inp.transpose(2, 0, 1)
 
     trans_output = get_affine_transform(
       c, s, r, [self.opt.output_w, self.opt.output_h])
     out = np.zeros((self.num_joints, self.opt.output_h, self.opt.output_w), 
-                    dtype=np.float16)
-    reg_target = np.zeros((self.num_joints, 1), dtype=np.float16)
+                    dtype=np.float32)
+    reg_target = np.zeros((self.num_joints, 1), dtype=np.float32)
     reg_ind = np.zeros((self.num_joints), dtype=np.int64)
     reg_mask = np.zeros((self.num_joints), dtype=np.uint8)
     pts_crop = np.zeros((self.num_joints, 2), dtype=np.int32)

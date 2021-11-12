@@ -42,8 +42,8 @@ class ThreeDPW(data.Dataset):
                      [16, 15], [15, 14], [14, 8], [8, 11], [11, 12], [12, 13]]
     self.mean_bone_length = 4000
     # normalize to mean and std of Imagenet
-    self.mean = np.array([0.485, 0.456, 0.406], np.float16).reshape(1, 1, 3)
-    self.std = np.array([0.229, 0.224, 0.225], np.float16).reshape(1, 1, 3)
+    self.mean = np.array([0.485, 0.456, 0.406], np.float32).reshape(1, 1, 3)
+    self.std = np.array([0.229, 0.224, 0.225], np.float32).reshape(1, 1, 3)
     self.aspect_ratio = 1.0 * opt.input_w / opt.input_h
     self.split = split
     self.opt = opt
@@ -71,10 +71,10 @@ class ThreeDPW(data.Dataset):
     # bbox = [c_x, c_y, w, h]
     # change to use 3dpw format.
     ann = self.annot[self.idxs[index]]
-    gt_3d = np.array(ann['joints3D'], np.float16) # relative joint coordinates, relative to pelvis, in mpii format (16 joints)
+    gt_3d = np.array(ann['joints3D'], np.float32) # relative joint coordinates, relative to pelvis, in mpii format (16 joints)
     gt_3d = gt_3d[self.mpii_to_h36m][:17] # relative joint coordinates, relative to pelvis, converted to H36M format (17 joints)
-    pts = np.array(ann['joints3D_image'], np.float16) # j3d_image is [image_coord_x, image_coord_y, depth-root depth], in mpii format (16 joints)
-    c = np.array([ann['bbox'][0], ann['bbox'][1]], dtype=np.float16) # c_x, c_y for bbox
+    pts = np.array(ann['joints3D_image'], np.float32) # j3d_image is [image_coord_x, image_coord_y, depth-root depth], in mpii format (16 joints)
+    c = np.array([ann['bbox'][0], ann['bbox'][1]], dtype=np.float32) # c_x, c_y for bbox
     s = max(ann['bbox'][2], ann['bbox'][3]) # w, h for bbox
     return gt_3d, pts, c, s
       
@@ -113,14 +113,14 @@ class ThreeDPW(data.Dataset):
       c, s, r, [self.opt.input_w, self.opt.input_h])
     inp = cv2.warpAffine(img, trans_input, (self.opt.input_w, self.opt.input_h),
                          flags=cv2.INTER_LINEAR)
-    inp = (inp.astype(np.float16) / 256. - self.mean) / self.std
+    inp = (inp.astype(np.float32) / 256. - self.mean) / self.std
     inp = inp.transpose(2, 0, 1)
 
     trans_output = get_affine_transform(
       c, s, r, [self.opt.output_w, self.opt.output_h])
     out = np.zeros((self.num_joints, self.opt.output_h, self.opt.output_w), 
-                    dtype=np.float16)
-    reg_target = np.zeros((self.num_joints, 1), dtype=np.float16)
+                    dtype=np.float32)
+    reg_target = np.zeros((self.num_joints, 1), dtype=np.float32)
     reg_ind = np.zeros((self.num_joints), dtype=np.int64)
     reg_mask = np.zeros((self.num_joints), dtype=np.uint8)
     pts_crop = np.zeros((self.num_joints, 2), dtype=np.int32)

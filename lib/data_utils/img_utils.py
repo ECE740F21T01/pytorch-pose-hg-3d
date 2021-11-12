@@ -48,7 +48,7 @@ def rotate_2d(pt_2d, rot_rad):
     sn, cs = np.sin(rot_rad), np.cos(rot_rad)
     xx = x * cs - y * sn
     yy = x * sn + y * cs
-    return np.array([xx, yy], dtype=np.float16)
+    return np.array([xx, yy], dtype=np.float32)
 
 def gen_trans_from_patch_cv(c_x, c_y, src_width, src_height, dst_width, dst_height, scale, rot, inv=False):
     # augment size with scale
@@ -56,32 +56,32 @@ def gen_trans_from_patch_cv(c_x, c_y, src_width, src_height, dst_width, dst_heig
     src_h = src_height * scale
     src_center = np.zeros(2)
     src_center[0] = c_x
-    src_center[1] = c_y # np.array([c_x, c_y], dtype=np.float16)
+    src_center[1] = c_y # np.array([c_x, c_y], dtype=np.float32)
     # augment rotation
     rot_rad = np.pi * rot / 180
-    src_downdir = rotate_2d(np.array([0, src_h * 0.5], dtype=np.float16), rot_rad)
-    src_rightdir = rotate_2d(np.array([src_w * 0.5, 0], dtype=np.float16), rot_rad)
+    src_downdir = rotate_2d(np.array([0, src_h * 0.5], dtype=np.float32), rot_rad)
+    src_rightdir = rotate_2d(np.array([src_w * 0.5, 0], dtype=np.float32), rot_rad)
 
     dst_w = dst_width
     dst_h = dst_height
-    dst_center = np.array([dst_w * 0.5, dst_h * 0.5], dtype=np.float16)
-    dst_downdir = np.array([0, dst_h * 0.5], dtype=np.float16)
-    dst_rightdir = np.array([dst_w * 0.5, 0], dtype=np.float16)
+    dst_center = np.array([dst_w * 0.5, dst_h * 0.5], dtype=np.float32)
+    dst_downdir = np.array([0, dst_h * 0.5], dtype=np.float32)
+    dst_rightdir = np.array([dst_w * 0.5, 0], dtype=np.float32)
 
-    src = np.zeros((3, 2), dtype=np.float16)
+    src = np.zeros((3, 2), dtype=np.float32)
     src[0, :] = src_center
     src[1, :] = src_center + src_downdir
     src[2, :] = src_center + src_rightdir
 
-    dst = np.zeros((3, 2), dtype=np.float16)
+    dst = np.zeros((3, 2), dtype=np.float32)
     dst[0, :] = dst_center
     dst[1, :] = dst_center + dst_downdir
     dst[2, :] = dst_center + dst_rightdir
 
     if inv:
-        trans = cv2.getAffineTransform(np.float16(dst), np.float16(src))
+        trans = cv2.getAffineTransform(np.float32(dst), np.float32(src))
     else:
-        trans = cv2.getAffineTransform(np.float16(src), np.float16(dst))
+        trans = cv2.getAffineTransform(np.float32(src), np.float32(dst))
 
     return trans
 
