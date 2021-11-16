@@ -28,8 +28,16 @@ class opts():
     self.parser.add_argument('--scale', type=float, default=-1)
     self.parser.add_argument('--rotate', type=float, default=-1)
     self.parser.add_argument('--flip', type = float, default=0.5)
-    self.parser.add_argument('--dataset', default = 'mpii', 
-                             help = 'mpii | coco')
+
+    # opt.dataset chooses to use which 2D dataset, or can choose Fusion3D
+    self.parser.add_argument('--dataset', default = 'mpii',
+                             help = 'mpii | lsp_extended | flic_full | fusion_3d')
+    # if opt.dataset is "fusion_3d", then need to choose which dataset2D and which dataset3D
+    self.parser.add_argument('--dataset2D', default = 'mpii',
+                             help = 'mpii | lsp_extended | flic_full')
+    self.parser.add_argument('--dataset3D', default = 'H36M',
+                             help = 'H36M | MPII3D | 3DPW | OcclusionPerson')
+    
     self.parser.add_argument('--all_pts', action = 'store_true',
                              help = 'heatmap for all persons in stack 1')
     self.parser.add_argument('--multi_person', action = 'store_true', 
@@ -56,8 +64,6 @@ class opts():
 
     self.parser.add_argument('--dataset3D', default = 'H36M', 
                              help = 'H36M | MPII3D | 3DPW | OcclusionPerson')
-    
-    self.parser.add_argument('--addr', default='10.136.181.115', type=str, help='master addr')
 
   def parse(self, args = ''):
     if args == '':
