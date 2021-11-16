@@ -58,6 +58,8 @@ def step(split, epoch, opt, data_loader, model, optimizer=None):
     if split == 'train':
       optimizer.zero_grad()
       loss.backward()
+      if opt.grad_clip:
+        torch.nn.utils.clip_grad_norm_(model.parameters(), opt.grad_clip_value)
       optimizer.step()
     else:
       input_ = batch['input'].cpu().numpy().copy()
