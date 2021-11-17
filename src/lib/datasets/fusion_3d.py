@@ -14,7 +14,7 @@ from .occlusion_person import OcclusionPerson
 class Fusion3D(data.Dataset):
   def __init__(self, opt, split):
     self.opt = opt
-    self.ratio3D = 1
+    self.ratio3D = opt.ratio_3d
     self.split = split
     
     if opt.dataset3D == "MPII3D":
@@ -38,11 +38,15 @@ class Fusion3D(data.Dataset):
       else:
           raise ValueError("Unrecognized dataset2D:", opt.dataset2D)
       self.nImages2D = len(self.dataset2D)
-      self.nImages3D = min(len(self.dataset3D), 
-                           int(self.nImages2D * self.ratio3D))
+      if self.ratio3D <= 0:
+          self.nImages3D = len(self.dataset3D)
+      else:
+          self.nImages3D = min(len(self.dataset3D), 
+                              int(self.nImages2D * self.ratio3D))
     else:
       self.nImages3D = len(self.dataset3D)
       self.nImages2D = 0
+    
     self.num_joints = self.dataset3D.num_joints
     self.num_eval_joints = self.dataset3D.num_eval_joints
     self.acc_idxs = self.dataset3D.acc_idxs
