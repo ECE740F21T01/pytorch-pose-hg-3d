@@ -61,7 +61,8 @@ def step(split, epoch, opt, data_loader, model, optimizer=None):
       #loss.backward()
       with amp.scale_loss(loss, optimizer) as scaled_loss:
         scaled_loss.backward()
-      #torch.nn.utils.clip_grad_norm_(model.parameters(), 5.0)
+      if opt.grad_clip is not None:
+        torch.nn.utils.clip_grad_norm_(model.parameters(), opt.grad_clip)
       optimizer.step()
     else:
       input_ = batch['input'].cpu().numpy().copy()
