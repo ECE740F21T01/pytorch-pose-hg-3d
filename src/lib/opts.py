@@ -29,7 +29,7 @@ class opts():
     self.parser.add_argument('--rotate', type=float, default=-1)
     self.parser.add_argument('--flip', type = float, default=0.5)
 
-    # opt.dataset chooses to use which 2D dataset, or can choose Fusion3D
+    # opt.dataset chooses to use which 2D dataset, which 3D dataset, or can choose Fusion3D to use combination of both.
     self.parser.add_argument('--dataset', default = 'mpii',
                              help = 'mpii | lsp_extended | flic_full | fusion_3d | H36M | MPII3D | 3DPW | OcclusionPerson')
     # if opt.dataset is "fusion_3d", then need to choose which dataset2D and which dataset3D

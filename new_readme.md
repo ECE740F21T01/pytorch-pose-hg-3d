@@ -14,11 +14,11 @@ Please refer to `setup.sh`
 - 3DPW
 - Occlusion-Person (a.k.a. OcclusionPerson)
 
-To do pretraining on 2D dataset only, use this argument:
+To do pretraining on 2D dataset only, or finetuning with 3D dataset only, use this argument:
 ```Python
-# opt.dataset chooses to use which 2D dataset, or can choose Fusion3D
+# opt.dataset chooses to use which 2D dataset, which 3D dataset, or can choose Fusion3D to use combination of both.
 self.parser.add_argument('--dataset', default = 'mpii',
-                            help = 'mpii | lsp_extended | flic_full | fusion_3d')
+                            help = 'mpii | lsp_extended | flic_full | fusion_3d | H36M | MPII3D | 3DPW | OcclusionPerson')
 ```
 
 When choosing opt.dataset as "fusion_3d", need to specify which 2D Dataset and which 3D dataset to use for training and evaluation (for evalaution only dataset3D is used), add these arguments
