@@ -5,16 +5,23 @@ import os
 
 from models.msra_resnet import get_pose_net
 
+
+def get_optimizer(model, optim_type, lr, weight_decay, momentum):
+  if optim_type in ['sgd', 'SGD']:
+    opt = torch.optim.SGD(lr=lr, params=model.parameters(), momentum=momentum)
+  elif optim_type in ['Adam', 'adam', 'ADAM']:
+    opt = torch.optim.Adam(lr=lr, params=model.parameters(), weight_decay=weight_decay)
+  else:
+    raise ModuleNotFoundError
+  return opt
+
+
 def create_model(opt): 
   if 'msra' in opt.arch:
     print("=> using msra resnet '{}'".format(opt.arch))
     num_layers = int(opt.arch[opt.arch.find('_') + 1:])
     model = get_pose_net(num_layers, opt.heads)
-    optimizer = torch.optim.SGD(model.parameters(), opt.lr,
-                                momentum=0.9,
-                                weight_decay=1e-4)  # TODO had to change from Adam...?
-    #optimizer = torch.optim.Adadelta(model.parameters(), opt.lr,
-    #                            weight_decay=1e-4)  # TODO had to change from Adam...?
+    optimizer = get_optimizer(model, opt.optim_type, opt.lr, opt.weight_decay, opt.momentum)
   else:
     assert 0, "Model not supported!"
     

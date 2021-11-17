@@ -24,6 +24,7 @@ class opts():
     self.parser.add_argument('--metric', default = 'acc')
     self.parser.add_argument('--resume', action = 'store_true')
     self.parser.add_argument('--load_model', default = '')
+    self.parser.add_argument('--optim_type', type=str, default='sgd')  # TODO SGD for NPU, also need scheduler...?
     self.parser.add_argument('--weight_decay', type=float, default=0.0)
     self.parser.add_argument('--scale', type=float, default=-1)
     self.parser.add_argument('--rotate', type=float, default=-1)
