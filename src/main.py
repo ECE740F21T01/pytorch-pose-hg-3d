@@ -5,7 +5,8 @@ from __future__ import print_function
 import _init_paths
 
 import os
-
+import random
+import numpy as np
 import torch
 import torch.utils.data
 from opts import opts
@@ -34,6 +35,11 @@ task_factory = {
 }
 
 def main(opt):
+  # set random seed
+  torch.manual_seed(opt.random_seed)
+  random.seed(opt.random_seed)
+  np.random.seed(opt.random_seed)
+
   if opt.disable_cudnn:
     torch.backends.cudnn.enabled = False
     print('Cudnn is disabled.')

@@ -3,7 +3,7 @@ import torch.nn as nn
 from torch.autograd import Function
 import numpy as np
 import warnings
-warnings.filterwarnings("ignore")
+# warnings.filterwarnings("ignore")
 
 
 def _gather_feat(feat, ind, mask=None):
@@ -62,7 +62,8 @@ class FusionLoss(nn.Module):
   
   def forward(self, output, mask, ind, target, gt_2d):
     pred = _tranpose_and_gather_scalar(output, ind)
-    loss = torch.FloatTensor(1)[0] * 0
+    # loss = torch.FloatTensor(1)[0] * 0 # numerically unstable
+    loss = torch.zeros(1)[0]
     if self.reg_weight > 0:
       loss += (self.reg_weight * reg_loss(pred, target, mask)).to('cpu')
     if self.var_weight > 0:
@@ -92,7 +93,8 @@ class VarLoss(Function):
   def forward(self, input, visible, mask, gt_2d):
     xy = gt_2d.view(gt_2d.size(0), -1, 2)
     batch_size = input.size(0)
-    output = torch.FloatTensor(1) * 0
+    # output = torch.FloatTensor(1) * 0 # numerically unstable
+    output = torch.zeros(1)
     for t in range(batch_size):
       if mask[t].sum() == 0: # mask is the mask for supervised depth
         # xy[t] = 2.0 * xy[t] / ref.outputRes - 1

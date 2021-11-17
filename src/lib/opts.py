@@ -62,6 +62,8 @@ class opts():
     self.parser.add_argument('--output_h', type = int, default = -1)
     self.parser.add_argument('--output_w', type = int, default = -1)
 
+    self.parser.add_argument('--random_seed', type = int, default = 0)
+    self.parser.add_argument('--grad_clip', type = float, default = None)  # Typical value would be 5.0
 
   def parse(self, args = ''):
     if args == '':

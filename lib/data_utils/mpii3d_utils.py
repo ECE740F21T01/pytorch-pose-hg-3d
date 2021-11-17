@@ -105,7 +105,7 @@ def read_data_train(dataset_path, debug=False):
             # mat file with annotations
             annot_file = os.path.join(seq_path, 'annot.mat')
             annot2 = sio.loadmat(annot_file)['annot2']
-            annot3 = sio.loadmat(annot_file)['univ_annot3']
+            annot3 = sio.loadmat(annot_file)['annot3']
             # calibration file and camera parameters
             for j, vid_i in enumerate(vid_list):
                 # image folder
@@ -231,7 +231,7 @@ def read_test_data(dataset_path):
         annot_file = os.path.join(seq_path, 'annot_data.mat')
         mat_as_h5 = h5py.File(annot_file, 'r')
         annot2 = np.array(mat_as_h5['annot2'])
-        annot3 = np.array(mat_as_h5['univ_annot3'])
+        annot3 = np.array(mat_as_h5['annot3'])
         valid = np.array(mat_as_h5['valid_frame'])
 
         vid_used_frames = []
