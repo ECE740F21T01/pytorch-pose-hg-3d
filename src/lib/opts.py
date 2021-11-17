@@ -31,7 +31,7 @@ class opts():
 
     # opt.dataset chooses to use which 2D dataset, or can choose Fusion3D
     self.parser.add_argument('--dataset', default = 'mpii',
-                             help = 'mpii | lsp_extended | flic_full | fusion_3d')
+                             help = 'mpii | lsp_extended | flic_full | fusion_3d | H36M | MPII3D | 3DPW | OcclusionPerson')
     # if opt.dataset is "fusion_3d", then need to choose which dataset2D and which dataset3D
     self.parser.add_argument('--dataset2D', default = 'mpii',
                              help = 'mpii | lsp_extended | flic_full')

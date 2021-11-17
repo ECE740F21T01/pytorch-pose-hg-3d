@@ -11,11 +11,18 @@ import torch
 import torch.utils.data
 from opts import opts
 from model import create_model, save_model
+
 from datasets.mpii import MPII
 from datasets.coco import COCO
 from datasets.lsp_extended import LSPExtended
 from datasets.flic_full import FLICFull
+
 from datasets.fusion_3d import Fusion3D
+from datasets.h36m import H36M
+from datasets.mpii3d import MPII3D
+from datasets.threedpw import ThreeDPW
+from datasets.occlusion_person import OcclusionPerson
+
 from logger import Logger
 from train import train, val
 from train_3d import train_3d, val_3d
@@ -26,7 +33,11 @@ dataset_factory = {
   'lsp_extended': LSPExtended,
   'flic_full': FLICFull,
   'coco': COCO,
-  'fusion_3d': Fusion3D
+  'fusion_3d': Fusion3D,
+  'H36M': H36M,
+  'MPII3D': MPII3D,
+  'ThreeDPW': ThreeDPW,
+  'OcclusionPerson': OcclusionPerson,
 }
 
 task_factory = {
