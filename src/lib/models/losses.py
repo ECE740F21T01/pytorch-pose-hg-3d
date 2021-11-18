@@ -193,5 +193,5 @@ class VarLoss(Function):
               grad_input[t][id2] += (var_weight * \
                 skeleton_weight[g][j] ** 2 / num * (l[j] - E) \
                 / l[j] * (input[t, id2] - input[t, id1]) / batch_size).cpu()
-    grad_input = grad_input.to(self.device, non_blocking=False)  # TODO CUDA
+    grad_input = grad_input.to(device, non_blocking=False)  # TODO CUDA
     return grad_input, None, None, None, None, None
