@@ -79,3 +79,7 @@ The code for MPI-INF-3DHP and 3DPW dataset preparing is adpoted from:
 The ./lib folder holds the code from VIBE repo, for the 3DPW and MPI-INF-3DHP dataset dataloader.
 
 For LSP-Extended Dataloader referenced: https://github.com/bmartacho/UniPose/blob/master/utils/lsp_lspet_data.py
+
+For calcualting depth scaling factor between gt_3d and pts (used by annotation file of src/lib/datasets/h36m.py), referenced: 
+- https://github.com/JimmySuen/integral-human-pose/blob/master/pytorch_projects/common_pytorch/dataset/hm36_eccv_challenge.py#L72-L76
+- https://github.com/JimmySuen/integral-human-pose/blob/master/common/utility/utils.py#L70

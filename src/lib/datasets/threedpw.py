@@ -19,6 +19,7 @@ from utils.image import flip, shuffle_lr
 from utils.image import draw_gaussian, adjust_aspect_ratio
 from utils.image import get_affine_transform, affine_transform
 from utils.image import transform_preds
+from utils.image import compute_similarity_transform
 
 class ThreeDPW(data.Dataset):
   def __init__(self, opt, split):
@@ -74,6 +75,15 @@ class ThreeDPW(data.Dataset):
     pts = np.array(ann['joints3D_image'], np.float32) # j3d_image is [image_coord_x, image_coord_y, depth-root depth], in mpii format (16 joints)
     c = np.array([ann['bbox'][0], ann['bbox'][1]], dtype=np.float32) # c_x, c_y for bbox
     s = max(ann['bbox'][2], ann['bbox'][3]) # w, h for bbox
+    
+    # to get the correct "depth-root" value for pts, using similarity transform to get depth_scale
+    # and then set pts[2] = gt_3d[2] * depth_scale
+    # Refence: https://github.com/JimmySuen/integral-human-pose/blob/master/pytorch_projects/common_pytorch/dataset/hm36_eccv_challenge.py#L72-L76
+    from_pose = gt_3d[:,0:2][self.h36m_to_mpii]
+    target_pose = pts[:,0:2]
+    _, _, _, depth_scale, _ = compute_similarity_transform(target_pose, from_pose, compute_optimal_scale=True)
+    pts[:,2] = gt_3d[:,2][self.h36m_to_mpii] * depth_scale
+    
     return gt_3d, pts, c, s
       
   def __getitem__(self, index):
