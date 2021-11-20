@@ -36,7 +36,7 @@ dataset_factory = {
   'fusion_3d': Fusion3D,
   'H36M': H36M,
   'MPII3D': MPII3D,
-  'ThreeDPW': ThreeDPW,
+  '3DPW': ThreeDPW,
   'OcclusionPerson': OcclusionPerson,
 }
 
