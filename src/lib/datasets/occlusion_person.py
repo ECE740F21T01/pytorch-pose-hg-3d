@@ -19,6 +19,7 @@ from utils.image import flip, shuffle_lr
 from utils.image import draw_gaussian, adjust_aspect_ratio
 from utils.image import get_affine_transform, affine_transform
 from utils.image import transform_preds
+from utils.image import compute_similarity_transform
 
 def get_unrealcv_joint_names():
     # Referenced: https://github.com/zhezh/adafuse-3d-human-pose/blob/main/lib/dataset/unrealcv_dataset.py
@@ -149,6 +150,14 @@ class OcclusionPerson(data.Dataset):
     c = np.array([ann['center'][0], ann['center'][1]], dtype=np.float32) # c_x, c_y
     s = max(ann['scale'][0]*200, ann['scale'][1]*200) # w, h for bbox (for occulusion-person need to multiply scale with 200)
     
+    # to get the correct "depth-root" value for pts, using similarity transform to get depth_scale
+    # and then set pts[2] = gt_3d[2] * depth_scale
+    # Refence: https://github.com/JimmySuen/integral-human-pose/blob/master/pytorch_projects/common_pytorch/dataset/hm36_eccv_challenge.py#L72-L76
+    from_pose = gt_3d[:,0:2][self.h36m_to_mpii]
+    target_pose = pts[:,0:2]
+    _, _, _, depth_scale, _ = compute_similarity_transform(target_pose, from_pose, compute_optimal_scale=True)
+    pts[:,2] = gt_3d[:,2][self.h36m_to_mpii] * depth_scale
+
     return gt_3d, pts, c, s
       
   def __getitem__(self, index):

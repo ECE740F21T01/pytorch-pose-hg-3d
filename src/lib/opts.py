@@ -19,7 +19,6 @@ class opts():
     self.parser.add_argument('--weight_var', type=float, default=0)
     self.parser.add_argument('--full_test', action='store_true')
 
-
     self.parser.add_argument('--hide_data_time', action = 'store_true')
     self.parser.add_argument('--metric', default = 'acc')
     self.parser.add_argument('--resume', action = 'store_true')

@@ -42,7 +42,6 @@ def step(split, epoch, opt, data_loader, model, optimizer=None):
     loss = crit(output[-1]['hm'], target_var)
     for k in range(opt.num_stacks - 1):
       loss += crit(output[k]['hm'], target_var)
-#    print("loss after for loop: {}".format(loss.shape))
 
     if split == 'train':
       optimizer.zero_grad()
