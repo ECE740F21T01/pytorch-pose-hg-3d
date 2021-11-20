@@ -92,6 +92,10 @@ def main(opt):
     log_dict_train, preds = val(0, opt, val_loader, model)
     sio.savemat(os.path.join(opt.save_dir, 'preds.mat'),
                 mdict = {'preds': preds})
+    msg = "Evalution: "
+    for key in log_dict_train.keys():
+        msg += "{}: {} | ".format(key, log_dict_train[key])
+    logger.write(msg)
     return
 
   train_loader = torch.utils.data.DataLoader(
