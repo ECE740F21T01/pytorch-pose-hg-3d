@@ -37,13 +37,9 @@ def reg_loss(regr, gt_regr, mask):
 
     regr    = regr * mask.float()
     gt_regr = gt_regr * mask.float()
-    
-    # TODO need to change loss from smooth_l1_loss to mse_loss for NPU
-    #print(regr.device)
-    #print(gt_regr.device)
-#    regr_loss = nn.functional.smooth_l1_loss(regr, gt_regr, size_average=False)
-    regr_loss = nn.functional.smooth_l1_loss(gt_regr, regr, size_average=False)
-    #regr_loss = nn.functional.mse_loss(regr, gt_regr, size_average=False)
+
+    #regr_loss = nn.functional.smooth_l1_loss(regr, gt_regr, size_average=False)
+    regr_loss = nn.functional.mse_loss(regr, gt_regr, size_average=False)
     regr_loss = regr_loss / (num + 1e-4)
     return regr_loss
 
@@ -143,7 +139,7 @@ class VarLoss(Function):
     ctx.save_for_backward(input, visible, mask, gt_2d)
     ctx.in1 = var_weight
     ctx.in2 = device
-    output = output.to(device, non_blocking=False)  # TODO CUDA
+    output = output.to(device, non_blocking=False)
     return output
 
   @staticmethod
@@ -193,5 +189,5 @@ class VarLoss(Function):
               grad_input[t][id2] += (var_weight * \
                 skeleton_weight[g][j] ** 2 / num * (l[j] - E) \
                 / l[j] * (input[t, id2] - input[t, id1]) / batch_size).cpu()
-    grad_input = grad_input.to(device, non_blocking=False)  # TODO CUDA
+    grad_input = grad_input.to(device, non_blocking=False)
     return grad_input, None, None, None, None, None

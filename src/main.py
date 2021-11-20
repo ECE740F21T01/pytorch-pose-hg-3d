@@ -60,7 +60,7 @@ def main(opt):
 
   logger = Logger(opt)
   if torch.cuda.is_available():
-      opt.device = torch.device('cuda:{}'.format(opt.gpus[0]))  # TODO CUDA FIXED
+      opt.device = torch.device('cuda:{}'.format(opt.gpus[0]))
   else:
       opt.device = torch.device('npu:{}'.format(opt.gpus[0]))
 
@@ -70,11 +70,10 @@ def main(opt):
   model, optimizer, start_epoch = create_model(opt)
  
   if len(opt.gpus) > 1:
-    model = torch.nn.DataParallel(model, device_ids=opt.gpus).to(opt.device)  # TODO CUDA fixed...?
+    model = torch.nn.DataParallel(model, device_ids=opt.gpus).to(opt.device)
   else:
-    model = model.to(opt.device)  # TODO CUDA fixed...?
-    
-  # TODO THIS IS ME ADDING AMP
+    model = model.to(opt.device)
+
   model, optimizer = amp.initialize(model, optimizer, opt_level='O2', 
                                    loss_scale=64)
     

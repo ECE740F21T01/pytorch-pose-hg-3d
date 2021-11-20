@@ -42,7 +42,7 @@ def create_model(opt):
       for state in optimizer.state.values():
         for k, v in state.items():
           if isinstance(v, torch.Tensor):
-            #state[k] = v.cuda(opt.device, non_blocking=True)  # TODO CUDA fixed...?
+            #state[k] = v.cuda(opt.device, non_blocking=True)
             state[k] = v.to(opt.device, non_blocking=False)
 
   return model, optimizer, start_epoch

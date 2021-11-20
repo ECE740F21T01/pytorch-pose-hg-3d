@@ -34,7 +34,7 @@ cfg = CN()
 
 cfg.OUTPUT_DIR = 'results'
 cfg.EXP_NAME = 'default'
-cfg.DEVICE = 'cuda' if torch.cuda.is_available() else 'npu'  # TODO FIXED CUDA here
+cfg.DEVICE = 'cuda' if torch.cuda.is_available() else 'npu'
 cfg.DEBUG = True
 cfg.LOGDIR = ''
 cfg.NUM_WORKERS = 8
