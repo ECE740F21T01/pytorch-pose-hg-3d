@@ -14,7 +14,7 @@ class opts():
     self.parser.add_argument('--demo', default = '', help = 'path/to/image')
 
     self.parser.add_argument('--task', default='human2d')
-    self.parser.add_argument('--ratio_3d', type=float, default=0)
+    self.parser.add_argument('--ratio_3d', type=float, default=1)
     self.parser.add_argument('--weight_3d', type=float, default=0)
     self.parser.add_argument('--weight_var', type=float, default=0)
     self.parser.add_argument('--full_test', action='store_true')

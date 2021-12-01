@@ -74,8 +74,8 @@ def main(opt):
   else:
     model = model.to(opt.device)
 
-  model, optimizer = amp.initialize(model, optimizer, opt_level='O2', 
-                                   loss_scale=64)
+#  model, optimizer = amp.initialize(model, optimizer, opt_level='O2', 
+#                                   loss_scale=64)
     
   cudnn.benchmark = True
 
