@@ -126,7 +126,7 @@ def checkpoint2model(checkpoint, key='gen_state_dict'):
 
 def get_optimizer(model, optim_type, lr, weight_decay, momentum):
     if optim_type in ['sgd', 'SGD']:
-        opt = torch.optim.SGD(lr=lr, params=model.parameters(), momentum=momentum)
+        opt = torch.optim.SGD(lr=lr, params=model.parameters(), momentum=momentum, weight_decay=weight_decay, nesterov=True)
     elif optim_type in ['Adam', 'adam', 'ADAM']:
         opt = torch.optim.Adam(lr=lr, params=model.parameters(), weight_decay=weight_decay)
     else:

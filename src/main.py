@@ -68,19 +68,19 @@ def main(opt):
   train, val = task_factory[opt.task]
 
   model, optimizer, start_epoch = create_model(opt)
- 
+
   if len(opt.gpus) > 1:
     model = torch.nn.DataParallel(model, device_ids=opt.gpus).to(opt.device)
   else:
     model = model.to(opt.device)
 
-#  model, optimizer = amp.initialize(model, optimizer, opt_level='O2', 
-#                                   loss_scale=64)
-    
-  cudnn.benchmark = True
+  model, optimizer = amp.initialize(model, optimizer, opt_level='O0') #,
+#                                   loss_scale="dynamic")
+
+  #cudnn.benchmark = True
 
   val_loader = torch.utils.data.DataLoader(
-      Dataset(opt, 'val'), 
+      Dataset(opt, 'val'),
       batch_size=1, 
       shuffle=False,
       num_workers=1,
