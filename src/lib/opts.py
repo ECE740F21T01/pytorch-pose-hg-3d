@@ -14,7 +14,7 @@ class opts():
     self.parser.add_argument('--demo', default = '', help = 'path/to/image')
 
     self.parser.add_argument('--task', default='human2d')
-    self.parser.add_argument('--ratio_3d', type=float, default=0)
+    self.parser.add_argument('--ratio_3d', type=float, default=1)
     self.parser.add_argument('--weight_3d', type=float, default=0)
     self.parser.add_argument('--weight_var', type=float, default=0)
     self.parser.add_argument('--full_test', action='store_true')
@@ -77,8 +77,7 @@ class opts():
     opt.epsilon = 1e-8
     opt.hm_gauss = 2
     opt.root_dir = os.path.join(os.path.dirname(__file__), '..', '..')
-    opt.data_dir = "D:\\Documents\\Research\\ECE740DS\\"
-    #opt.data_dir = os.path.join(opt.root_dir, 'data')
+    opt.data_dir = os.path.join(opt.root_dir, 'data')
     opt.exp_dir = os.path.join(opt.root_dir, 'exp')
 
     opt.save_dir = os.path.join(opt.exp_dir, opt.exp_id)
@@ -87,7 +86,9 @@ class opts():
 
     opt.gpus = [int(gpu) for gpu in opt.gpus.split(',')]
     opt.lr_step = [int(i) for i in opt.lr_step.split(',')]
-    if opt.test:
+    if opt.full_test:
+      opt.exp_id = opt.exp_id + 'FULL_TEST'
+    elif opt.test:
       opt.exp_id = opt.exp_id + 'TEST'
     opt.save_dir = os.path.join(opt.exp_dir, opt.exp_id)
 
