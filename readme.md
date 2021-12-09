@@ -60,7 +60,7 @@ The code was tested with [Anaconda](https://www.anaconda.com/download) Python 3.
         - Human3.6M (H36M)
         - Occlusion-Person (OP)
         - MPI-INF-3DHP (MPII3D)
-        - 3DPW
+        - 3DPW (Implemented, but not used)
 - Prepare the training data:
     - `DATA_ROOT=path/to/your/datasets/downloads`
     - MPII:
@@ -176,8 +176,11 @@ The code was tested with [Anaconda](https://www.anaconda.com/download) Python 3.
         └── mpii3d_val_db.pt
     ```
 
+# Code
+- Execute all experiments, e.g. `demo.py`, `main.py` from the /src/ folder.
+
 ## Demo
-- Download our pre-trained [model](https://drive.google.com/open?id=1_2CCb_qsA1egT5c2s0ABuW3rQCDOLvPq) and move it to `models`.
+- Download the original pre-trained [model](https://drive.google.com/open?id=1_2CCb_qsA1egT5c2s0ABuW3rQCDOLvPq) and move it to `models`.
 - Run `python demo.py --demo /path/to/image/or/image/folder [--gpus -1] [--load_model /path/to/model]`. 
 
 `--gpus -1` is for CPU mode. 
@@ -192,7 +195,7 @@ python main.py --exp_id test --task human3d --dataset fusion_3d --load_model ../
 
 The expected results should be 64.55mm.
 
-## Training
+## Training Your Own Models
 
 - Stage1: Train 2D pose only. [model](https://drive.google.com/open?id=1WqW1-_gCyGTB80m9MK_KUoD0dtElEQzv), [log](https://drive.google.com/open?id=1yKwmGD4MURHnDD5536niPjxe-keY3HGs)
 
@@ -212,7 +215,21 @@ python main.py --exp_id fusion_3d --task human3d --dataset fusion_3d --ratio_3d 
 python main.py --exp_id fusion_3d_var --task human3d --dataset fusion_3d --ratio_3d 1 --weight_3d 0.1 --weight_var 0.01 --load_model ../models/fusion_3d.pth  --num_epoch 10 --lr 1e-4
 ```
 
-## Citation
+### 3D Exclusive Training - Stages 2 and 3, uses all 3D data
+ - Stage 2:
+```
+python main.py --exp_id exclusive_3d_s2 --task human3d --dataset H36M --dataset3D H36M --ratio_3d 0 --weight_3d 1.0 --num_epoch 60 --lr_step 45
+```
+
+ - Stage 3:
+```
+python main.py --exp_id exclusive_3d_s3 --task human3d --dataset H36M --dataset3D H36M --ratio_3d 0 --weight_3d 0.1 --load_model ../exp/exclusive_3d_s2/model_best.pth  --num_epoch 10 --lr 1e-4
+```
+
+### Implementation for Huawei Ascend NPU Server
+ - See the branch `NPU` for the working implementation. Commands are unchanged.
+
+## Citation of the original paper:
 
     @InProceedings{Zhou_2017_ICCV,
     author = {Zhou, Xingyi and Huang, Qixing and Sun, Xiao and Xue, Xiangyang and Wei, Yichen},
@@ -222,7 +239,7 @@ python main.py --exp_id fusion_3d_var --task human3d --dataset fusion_3d --ratio
     year = {2017}
     }
 
-## References:
+## References to other papers borrowed from for this project:
 
 - The original code of this project is adpoted from:
    ```
