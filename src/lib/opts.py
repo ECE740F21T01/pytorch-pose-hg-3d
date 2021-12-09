@@ -24,7 +24,7 @@ class opts():
     self.parser.add_argument('--resume', action = 'store_true')
     self.parser.add_argument('--load_model', default = '')
     self.parser.add_argument('--optim_type', type=str, default='sgd') # TODO should we use a learning rate scheduler?
-    self.parser.add_argument('--weight_decay', type=float, default=0.0)
+    self.parser.add_argument('--weight_decay', type=float, default=1e-4)
     self.parser.add_argument('--scale', type=float, default=-1)
     self.parser.add_argument('--rotate', type=float, default=-1)
     self.parser.add_argument('--flip', type = float, default=0.5)
@@ -72,7 +72,7 @@ class opts():
       opt = self.parser.parse_args(args)
     
     opt.eps = 1e-6
-    opt.momentum = 0.0
+    opt.momentum = 0.9
     opt.alpha = 0.99
     opt.epsilon = 1e-8
     opt.hm_gauss = 2
