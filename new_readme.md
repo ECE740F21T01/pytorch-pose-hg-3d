@@ -16,7 +16,8 @@
   
   - Data size cap:
     - To use/remove 3D dataset size limit when using `fusion_3d`, use the `--ratio_3d` argument.
-      - By default, `--ratio_3d` have default value set to 0, i.e. using any value <= 0 will remove the size cap
+      - By default, `--ratio_3d` have default value set to 1. 
+      - Using any value <= 0 will remove the size cap.
       - `--ratio_3d 1` will limit `3D dataset size` to be `1 * 2D dataset size`. Or replace 1 with any value > 0.
 
 ## Other Changes From Original Code:
