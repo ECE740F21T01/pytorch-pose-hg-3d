@@ -200,20 +200,24 @@ The expected results should be 64.55mm.
 - Stage1: Train 2D pose only. [model](https://drive.google.com/open?id=1WqW1-_gCyGTB80m9MK_KUoD0dtElEQzv), [log](https://drive.google.com/open?id=1yKwmGD4MURHnDD5536niPjxe-keY3HGs)
 
 ```
-python main.py --exp_id mpii
+python main.py --exp_id mpii --dataset mpii
 ```
 
 - Stage2: Train on 2D and 3D data without geometry loss (drop LR at 45 epochs). [model](https://drive.google.com/open?id=13d3AqzA85TSO7o1F8aq_ptnAkJ7LSp9-), [log](https://drive.google.com/open?id=18B_aOM9djCHZFlB0Rcoa6zOK1eXvsmRl)
 
 ```
-python main.py --exp_id fusion_3d --task human3d --dataset fusion_3d --ratio_3d 1 --weight_3d 0.1 --load_model ../exp/mpii/model_last.pth --num_epoch 60 --lr_step 45
+python main.py --exp_id fusion_3d --task human3d --dataset fusion_3d --dataset2D mpii --dataset3D H36M --ratio_3d 1 --weight_3d 0.1 --load_model ../exp/mpii/model_last.pth --num_epoch 60 --lr_step 45
 ```
 
 - Stage3: Train with geometry loss. [model](https://drive.google.com/open?id=1_2CCb_qsA1egT5c2s0ABuW3rQCDOLvPq), [log](https://drive.google.com/open?id=1hV4V74lTUd3COnoe1XMiTb8EUcyI8obN)
 
 ```
-python main.py --exp_id fusion_3d_var --task human3d --dataset fusion_3d --ratio_3d 1 --weight_3d 0.1 --weight_var 0.01 --load_model ../models/fusion_3d.pth  --num_epoch 10 --lr 1e-4
+python main.py --exp_id fusion_3d_var --task human3d --dataset fusion_3d --dataset2D mpii --dataset3D H36M --ratio_3d 1 --weight_3d 0.1 --weight_var 0.01 --load_model ../models/fusion_3d.pth  --num_epoch 10 --lr 1e-4
 ```
+
+### Dataset Selection and Other Input Arguments
+- See detailed instructions in [new_readme.md](new_readme.md)
+- See args defined in [src/lib/opts.py](src/lib/opts.py)
 
 ### 3D Exclusive Training - Stages 2 and 3, uses all 3D data
  - Stage 2:
